@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Config
-@TeleOp(name = "LITERALLY ANYTHING", group = "TeleOp")
+@TeleOp(name = "audrey is a meanie", group = "TeleOp")
 public class Blue_Red_TeleOp extends CommandOpMode {
     @Override
     public void initialize() {
