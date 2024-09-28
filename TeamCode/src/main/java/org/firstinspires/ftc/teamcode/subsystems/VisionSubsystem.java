@@ -3,18 +3,15 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import static java.lang.Thread.sleep;
 
 import android.graphics.Bitmap;
-import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.util.Size;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.checkerframework.checker.units.qual.C;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.function.Consumer;
 import org.firstinspires.ftc.robotcore.external.function.Continuation;
@@ -23,7 +20,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.teamcode.SampleVisionProcessor;
+import org.firstinspires.ftc.teamcode.vision.SampleVisionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
@@ -33,7 +30,7 @@ import org.opencv.core.Mat;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
+
 @Config
 public class VisionSubsystem extends SubsystemBase {
 
@@ -62,9 +59,9 @@ public class VisionSubsystem extends SubsystemBase {
                 .build();
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .addProcessors(dashboard, aprilTag, sampleVisionProcessor)
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG) // worse compression than the default but faster
-                .addProcessors(dashboard, aprilTag, sampleVisionProcessor)
                 .build();
 
         // some hacky logic to make sure the camera is fully ready before we put in our configs
@@ -76,7 +73,6 @@ public class VisionSubsystem extends SubsystemBase {
             cameraState = visionPortal.getCameraState();
         }
         telemetry.log().add("Time from build to streaming " + elapsedTime.milliseconds() + "ms");
-
         if (visionPortal.getCameraState() == VisionPortal.CameraState.STREAMING) {
             ExposureControl exposureControl = visionPortal.getCameraControl(ExposureControl.class);
             if (exposureControl.getMode() != ExposureControl.Mode.Manual) {

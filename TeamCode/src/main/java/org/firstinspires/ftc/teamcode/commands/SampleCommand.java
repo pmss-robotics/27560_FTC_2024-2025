@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.subsystems.SampleSubsystem;
 
 public class SampleCommand extends CommandBase {
     private final SampleSubsystem sampleSubsystem;
-    SampleCommand(SampleSubsystem sampleSubsystem) {
+    public SampleCommand(SampleSubsystem sampleSubsystem) {
         this.sampleSubsystem = sampleSubsystem;
         // instantiate other parameters if there are
         addRequirements(sampleSubsystem);
