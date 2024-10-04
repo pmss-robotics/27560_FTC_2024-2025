@@ -24,8 +24,9 @@ public class GenericPositionServoSubsystem extends SubsystemBase {
     }
     @Override
     public void periodic() {
-        telemetry.addData(servoName+": " , servo.getPosition());
-        telemetry.update();
+        if(!Double.isNaN(servo.getPosition())){
+            telemetry.addData(servoName+": " , servo.getPosition());
+        }
     }
 
     public void setPosition(double position) {

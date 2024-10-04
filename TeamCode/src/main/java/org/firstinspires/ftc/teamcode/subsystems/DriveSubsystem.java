@@ -25,7 +25,7 @@ public class DriveSubsystem extends SubsystemBase {
     public void fieldCentric(double lx, double ly, double rx) {
         // TODO verify if this works the inverse() might not be necessary
         setDrivePowers(new PoseVelocity2d(
-                drive.pose.heading.inverse().times(new Vector2d(lx, ly)),
+                drive.pose.heading.inverse().times(new Vector2d(ly, lx)),
                 rx
         ));
         updatePoseEstimate();
@@ -37,8 +37,8 @@ public class DriveSubsystem extends SubsystemBase {
     public void robotCentric(double lx, double ly, double rx) {
         setDrivePowers(new PoseVelocity2d(
                 new Vector2d(
-                        lx,
-                        ly
+                        ly,
+                        lx
                 ),
                 rx
         ));

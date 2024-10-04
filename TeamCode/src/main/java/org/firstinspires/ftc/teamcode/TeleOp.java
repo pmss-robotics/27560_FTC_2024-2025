@@ -28,7 +28,7 @@ import org.firstinspires.ftc.teamcode.subsystems.GenericPositionServoSubsystem;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOP", group = "TeleOp")
 public class TeleOp extends CommandOpMode {
     public static double servoIncrement = 0.002;
-    public static double servoSpeed = 1;
+    public static double servoSpeed = 0.5;
     @Override
     public void initialize() {
         // data sent to telemetry shows up on dashboard and driverGamepad station
@@ -53,32 +53,45 @@ public class TeleOp extends CommandOpMode {
                 true);
 
         GenericMotorSubsystem genericMotorSubsystem = new GenericMotorSubsystem(hardwareMap, telemetry, "intakeMotor");
-        new Trigger(()-> tools.getRightY() != 0).whenActive(new InstantCommand(
-                () -> genericMotorSubsystem.setPower(tools::getRightY),
+        genericMotorSubsystem.setDefaultCommand(new RunCommand(
+                () -> genericMotorSubsystem.setPower(tools.getRightY()),
                 genericMotorSubsystem
         ));
 
         GenericPositionServoSubsystem genericPositionServoSubsystem = new GenericPositionServoSubsystem(hardwareMap, telemetry, "servo", 0.5);
         genericPositionServoSubsystem.setDefaultCommand(new RunCommand(
-                        () -> genericPositionServoSubsystem.setPosition(genericPositionServoSubsystem.position)
+                () -> genericPositionServoSubsystem.setPosition(genericPositionServoSubsystem.position),
+                genericPositionServoSubsystem
         ));
         new GamepadButton(tools, GamepadKeys.Button.LEFT_BUMPER)
-                .whenActive(new InstantCommand(
+                .whileHeld(new InstantCommand(
                         () -> genericPositionServoSubsystem.incrementPosition(-servoIncrement),
                         genericPositionServoSubsystem
                 ));
         new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER)
-                .whenActive(new InstantCommand(
+                .whileHeld(new InstantCommand(
                         () -> genericPositionServoSubsystem.incrementPosition(servoIncrement),
                         genericPositionServoSubsystem
                 ));
 
         GenericContinuousServoSubsystem genericContinuousServoSubsystem = new GenericContinuousServoSubsystem(hardwareMap, telemetry, "servo");
         // to trigger you can do something similar to whats done in genericMotorSubsystem or...
-        new GamepadButton(tools, GamepadKeys.Button.A).toggleWhenPressed(new InstantCommand(
-                () -> genericContinuousServoSubsystem.setPower(servoSpeed)));
-        new GamepadButton(tools, GamepadKeys.Button.B).toggleWhenPressed(new InstantCommand(
-                () -> genericContinuousServoSubsystem.setPower(-servoSpeed)));
+        new GamepadButton(tools, GamepadKeys.Button.A).toggleWhenPressed(
+                new InstantCommand(
+                    () -> genericContinuousServoSubsystem.setPower(0.5+servoSpeed),
+                    genericContinuousServoSubsystem),
+                new InstantCommand(
+                        () -> genericContinuousServoSubsystem.setPower(0.5),
+                        genericContinuousServoSubsystem)
+        );
+        new GamepadButton(tools, GamepadKeys.Button.B).toggleWhenPressed(
+                new InstantCommand(
+                        () -> genericContinuousServoSubsystem.setPower(0.5-servoSpeed),
+                        genericContinuousServoSubsystem),
+                new InstantCommand(
+                        () -> genericContinuousServoSubsystem.setPower(0.5),
+                        genericContinuousServoSubsystem)
+        );
 
 
         // sample for action and command synergy and binding
@@ -88,8 +101,7 @@ public class TeleOp extends CommandOpMode {
         // the binding for whenPressed() is convenient since it only activates once even when A is held down.
         //driverGamepad.getGamepadButton(GamepadKeys.Button.A).whenPressed(new ActionCommand(sampleMechanism.doSampleMechanismAction(), subsystemSet));
 
-        //TODO: see if this runs perpetually
-        // also we might not want to be creating a new packet in each loop
+
         schedule(new RunCommand(() -> {
             TelemetryPacket packet = new TelemetryPacket();
             Pose2d pose = drive.getPose();
