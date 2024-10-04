@@ -31,7 +31,6 @@ public class GenericMotorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         telemetry.addData(motorName+": ", motor.get());
-        telemetry.update();
     }
 
     public void setPower(DoubleSupplier power) {
