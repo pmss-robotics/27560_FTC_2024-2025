@@ -52,6 +52,7 @@ public class TeleOp extends CommandOpMode {
                 () -> -driver.getRightX(),
                 true);
 
+        /*
         GenericMotorSubsystem genericMotorSubsystem = new GenericMotorSubsystem(hardwareMap, telemetry, "intakeMotor");
         genericMotorSubsystem.setDefaultCommand(new RunCommand(
                 () -> genericMotorSubsystem.setPower(tools.getRightY()),
@@ -92,6 +93,8 @@ public class TeleOp extends CommandOpMode {
                         () -> genericContinuousServoSubsystem.setPower(0.5),
                         genericContinuousServoSubsystem)
         );
+
+         */
 
 
         // sample for action and command synergy and binding

@@ -20,6 +20,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.teamcode.vision.SampleDetectionVisionProcessor;
 import org.firstinspires.ftc.teamcode.vision.SampleVisionProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
@@ -37,7 +38,7 @@ public class VisionSubsystem extends SubsystemBase {
     public static int EXPOSURE_MS = 6;
     public static int GAIN = 190;
     private final AprilTagProcessor aprilTag;
-    private final SampleVisionProcessor sampleVisionProcessor;
+    private final SampleDetectionVisionProcessor sampleDetection;
     private final VisionPortal visionPortal;
     private Telemetry telemetry;
 
@@ -49,7 +50,7 @@ public class VisionSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         // TODO sample code!!!! re-implement in the field.
         final CameraStreamProcessor dashboard = new CameraStreamProcessor();
-        sampleVisionProcessor = new SampleVisionProcessor();
+        sampleDetection = new SampleDetectionVisionProcessor();
         aprilTag = new AprilTagProcessor.Builder()
                 .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .setDrawTagID(true)
@@ -59,7 +60,7 @@ public class VisionSubsystem extends SubsystemBase {
                 .build();
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .addProcessors(dashboard, aprilTag, sampleVisionProcessor)
+                .addProcessors(dashboard, aprilTag, sampleDetection)
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG) // worse compression than the default but faster
                 .build();

@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.vision;
 
-import org.openftc.easyopencv.OpenCvPipeline;
+import android.graphics.Canvas;
 
+import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
+import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
@@ -10,16 +12,17 @@ import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.MatOfPoint3f;
-import org.opencv.core.Point3;
 import org.opencv.core.Point;
+import org.opencv.core.Point3;
 import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
-public class SampleDetectionPipelinePNP extends OpenCvPipeline
+public class SampleDetectionVisionProcessor implements VisionProcessor
 {
     /*
      * Our working image buffers
@@ -80,21 +83,9 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
     /*
      * Some stuff to handle returning our various buffers
      */
-    enum Stage
-    {
-        FINAL,
-        YCrCb,
-        MASKS,
-        MASKS_NR,
-        CONTOURS;
-    }
 
-    Stage[] stages = Stage.values();
 
-    // Keep track of what stage the viewport is showing
-    int stageNum = 0;
-
-    public SampleDetectionPipelinePNP()
+    public SampleDetectionVisionProcessor()
     {
         // Initialize camera parameters
         // Replace these values with your actual camera calibration parameters
@@ -117,20 +108,12 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
     }
 
     @Override
-    public void onViewportTapped()
-    {
-        int nextStageNum = stageNum + 1;
+    public void init(int width, int height, CameraCalibration calibration) {
 
-        if(nextStageNum >= stages.length)
-        {
-            nextStageNum = 0;
-        }
-
-        stageNum = nextStageNum;
     }
 
     @Override
-    public Mat processFrame(Mat input)
+    public Object processFrame(Mat input, long captureTimeNanos)
     {
         // We'll be updating this with new data below
         internalStoneList.clear();
@@ -142,44 +125,12 @@ public class SampleDetectionPipelinePNP extends OpenCvPipeline
 
         clientStoneList = new ArrayList<>(internalStoneList);
 
-        /*
-         * Decide which buffer to send to the viewport
-         */
-        switch (stages[stageNum])
-        {
-            case YCrCb:
-            {
-                return ycrcbMat;
-            }
-
-            case FINAL:
-            {
-                return input;
-            }
-
-            case MASKS:
-            {
-                Mat masks = new Mat();
-                Core.addWeighted(yellowThresholdMat, 1.0, redThresholdMat, 1.0, 0.0, masks);
-                Core.addWeighted(masks, 1.0, blueThresholdMat, 1.0, 0.0, masks);
-                return masks;
-            }
-
-            case MASKS_NR:
-            {
-                Mat masksNR = new Mat();
-                Core.addWeighted(morphedYellowThreshold, 1.0, morphedRedThreshold, 1.0, 0.0, masksNR);
-                Core.addWeighted(masksNR, 1.0, morphedBlueThreshold, 1.0, 0.0, masksNR);
-                return masksNR;
-            }
-
-            case CONTOURS:
-            {
-                return contoursOnPlainImageMat;
-            }
-        }
-
         return input;
+    }
+
+    @Override
+    public void onDrawFrame(Canvas canvas, int onscreenWidth, int onscreenHeight, float scaleBmpPxToCanvasPx, float scaleCanvasDensity, Object userContext) {
+
     }
 
     public ArrayList<AnalyzedStone> getDetectedStones()
