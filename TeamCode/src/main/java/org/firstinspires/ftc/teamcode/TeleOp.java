@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.commands.ActionCommand;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.drive.Drawing;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.PinpointDrive;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.GenericContinuousServoSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.GenericMotorSubsystem;
@@ -40,7 +41,7 @@ public class TeleOp extends CommandOpMode {
         GamepadEx driver = new GamepadEx(gamepad1);
         GamepadEx tools = new GamepadEx(gamepad2);
         // The driveSubsystem wraps Roadrunner's MecanumDrive to combine with Commands.
-        DriveSubsystem drive = new DriveSubsystem(new MecanumDrive(hardwareMap, new Pose2d(0, 0, 0)), telemetry);
+        DriveSubsystem drive = new DriveSubsystem(new PinpointDrive(hardwareMap, new Pose2d(0, 0, 0)), telemetry);
         // The driveCommand uses methods defined in the DriveSubsystem to create behaviour.
         // we're passing in methods to get values instead of straight values because it avoids
         // disturbing the structure of the CommandOpMode. The aim is to define bindings in this

@@ -15,6 +15,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.commands.ActionCommand;
 import org.firstinspires.ftc.teamcode.drive.Drawing;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.PinpointDrive;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
 import java.util.stream.Collectors;
@@ -27,7 +28,7 @@ public class Blue_Red_Autonomous extends CommandOpMode {
     @Override
     public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        DriveSubsystem drive = new DriveSubsystem(new MecanumDrive(hardwareMap, new Pose2d(0, 0,0)), telemetry);
+        DriveSubsystem drive = new DriveSubsystem(new PinpointDrive(hardwareMap, new Pose2d(0, 0,0)), telemetry);
 
         Action trajectoryAction = drive.actionBuilder(drive.getPose())
                 .splineTo(new Vector2d(10, 10), Math.PI / 2)

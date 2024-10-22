@@ -12,6 +12,7 @@ import com.acmerobotics.roadrunner.ftc.OverflowEncoder;
 import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.messages.ThreeDeadWheelInputsMessage;
@@ -30,14 +31,13 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
 
     public final double inPerTick;
 
-    private int lastPar0Pos, lastPar1Pos, lastPerpPos;
+    private double lastPar0Pos, lastPar1Pos, lastPerpPos;
     private boolean initialized;
 
     public ThreeDeadWheelLocalizer(HardwareMap hardwareMap, double inPerTick) {
         // TODO: make sure your config has **motors** with these names (or change them)
         //   the encoders should be plugged into the slot matching the named motor
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
-        //   NOTE THAT PORTS 0 AND 3 ON THE CONTROL HUB ARE MORE ACCURATE AT HIGH SPEEDS SO USE THEM FOR PAR0 and PAR1
         par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "par0")));
         par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "par1")));
         perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "perp")));
@@ -70,9 +70,9 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
             );
         }
 
-        int par0PosDelta = par0PosVel.position - lastPar0Pos;
-        int par1PosDelta = par1PosVel.position - lastPar1Pos;
-        int perpPosDelta = perpPosVel.position - lastPerpPos;
+        double par0PosDelta = par0PosVel.position - lastPar0Pos;
+        double par1PosDelta = par1PosVel.position - lastPar1Pos;
+        double perpPosDelta = perpPosVel.position - lastPerpPos;
 
         Twist2dDual<Time> twist = new Twist2dDual<>(
                 new Vector2dDual<>(
