@@ -19,6 +19,8 @@ import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.drive.Drawing;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.PinpointDrive;
+import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.GenericContinuousServoSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.GenericMotorSubsystem;
@@ -52,6 +54,28 @@ public class TeleOp extends CommandOpMode {
                 () -> -driver.getLeftY(),
                 () -> -driver.getRightX(),
                 true);
+
+        ArmExtensionSubsystem armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
+        armExt.setDefaultCommand( new RunCommand(armExt::holdPosition));
+
+        ArmPivotSubsystem armPivot = new ArmPivotSubsystem(hardwareMap, telemetry, armExt.extensions::getCurrentPosition);
+        armPivot.setDefaultCommand(new RunCommand(armPivot::holdPosition));
+
+        /*
+        control objectives:
+        toggle - close intake <-> home
+        toggle - far intake <-> home
+        toggle - high? bucket <-> home
+        toggle - low bucket <-> home
+        toggle - auto align then pick up <-> claw disengaged
+
+        toggle - specimen <-> home
+        button - place specimen & reset (extend down, release claw, extend up)
+
+        + each position should be reached by at most 1 motion.
+        + i.e. we can go from close intake to low bucket without going thru home.
+         */
+
 
         /*
         GenericMotorSubsystem genericMotorSubsystem = new GenericMotorSubsystem(hardwareMap, telemetry, "intakeMotor");
