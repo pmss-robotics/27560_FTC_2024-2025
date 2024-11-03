@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.States;
 
 @Config
 public class ArmExtensionSubsystem extends SubsystemBase {
@@ -18,23 +19,26 @@ public class ArmExtensionSubsystem extends SubsystemBase {
 
     public static double P = 0, I = 0, D = 0;
     public static double kSpring = 0;
+    public static int pHome = 0, pIntake = 0, pSpecimen = 0, pBucket = 0;
 
-    public int target = 0;
+    public static int target = 0;
 
     private PIDController pidController;
     private VoltageSensor voltageSensor;
+    private States.ArmExtension currentState;
 
 
     public ArmExtensionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         // initialize hardware here alongside other parameters
         this.telemetry = telemetry;
+        currentState = States.ArmExtension.home;
+
         MotorEx leftExtension = new MotorEx(hardwareMap, "leftExtension");
         MotorEx rightExtension = new MotorEx(hardwareMap, "rightExtension");
         rightExtension.setInverted(true);
         extensions = new MotorGroup(leftExtension, rightExtension);
         extensions.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         extensions.stopAndResetEncoder();
-
 
         pidController = new PIDController(P, I, D);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -56,6 +60,28 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     public void manual(double power) {
         extensions.set(calculate() + power);
         target = extensions.getCurrentPosition();
+    }
+
+    public States.ArmExtension getCurrentState() {
+        return currentState;
+    }
+
+    public void setState(States.ArmExtension state) {
+        currentState = state;
+        switch (currentState) {
+            case bucket:
+                moveTo(pBucket);
+                break;
+            case intake:
+                moveTo(pIntake);
+                break;
+            case specimen:
+                moveTo(pSpecimen);
+                break;
+            case home:
+                moveTo(pHome);
+                break;
+        }
     }
 
     private double calculate() {

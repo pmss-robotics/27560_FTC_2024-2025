@@ -10,9 +10,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.util.States;
 
-import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
+
+
 
 @Config
 public class ArmPivotSubsystem extends SubsystemBase {
@@ -23,8 +25,10 @@ public class ArmPivotSubsystem extends SubsystemBase {
     public static double P = 0, I = 0, D = 0;
     public static double kCos = 0,kExt;
     public static double ticksPerRev = 0;
+    public static int pBucket = 0, pSpecimen = 0, pIntake = 0;
 
-    public int target = 0;
+    public static int target = 0;
+    private States.ArmPivot currentState;
 
     private PIDController pidController;
     private VoltageSensor voltageSensor;
@@ -33,6 +37,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
         // initialize hardware here alongside other parameters
         this.telemetry = telemetry;
         this.extensionAmount = extensionAmount;
+        currentState = States.ArmPivot.intake;
 
         MotorEx leftPivot = new MotorEx(hardwareMap, "leftPivot", Motor.GoBILDA.RPM_435);
         MotorEx rightPivot = new MotorEx(hardwareMap, "rightPivot");
@@ -61,6 +66,25 @@ public class ArmPivotSubsystem extends SubsystemBase {
     public void manual(double power) {
         pivots.set(calculate() + power);
         target = pivots.getCurrentPosition();
+    }
+
+    public States.ArmPivot getCurrentState() {
+        return currentState;
+    }
+
+    public void setState(States.ArmPivot state) {
+        currentState = state;
+        switch (currentState) {
+            case bucket:
+                moveTo(pBucket);
+                break;
+            case intake:
+                moveTo(pIntake);
+                break;
+            case specimen:
+                moveTo(pSpecimen);
+                break;
+        }
     }
 
     private double calculate() {
