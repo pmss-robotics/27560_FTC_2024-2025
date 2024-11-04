@@ -37,7 +37,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     public static int EXPOSURE_MS = 6;
     public static int GAIN = 190;
-    private final AprilTagProcessor aprilTag;
+    //private final AprilTagProcessor aprilTag;
     private final SampleDetectionVisionProcessor sampleDetection;
     private final VisionPortal visionPortal;
     private Telemetry telemetry;
@@ -51,6 +51,7 @@ public class VisionSubsystem extends SubsystemBase {
         // TODO sample code!!!! re-implement in the field.
         final CameraStreamProcessor dashboard = new CameraStreamProcessor();
         sampleDetection = new SampleDetectionVisionProcessor();
+        /*
         aprilTag = new AprilTagProcessor.Builder()
                 .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .setDrawTagID(true)
@@ -58,12 +59,16 @@ public class VisionSubsystem extends SubsystemBase {
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
                 .build();
+
+         */
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
-                .addProcessors(dashboard, aprilTag, sampleDetection)
+                .addProcessors(dashboard, sampleDetection)
                 .setCameraResolution(new Size(640, 480))
                 .setStreamFormat(VisionPortal.StreamFormat.MJPEG) // worse compression than the default but faster
                 .build();
+
+        visionPortal.setProcessorEnabled(sampleDetection, false);
 
         // some hacky logic to make sure the camera is fully ready before we put in our configs
         // otherwise it'll just crash, which is bad
@@ -86,8 +91,20 @@ public class VisionSubsystem extends SubsystemBase {
             gainControl.setGain(GAIN);
             sleep(20);
         }
-        FtcDashboard.getInstance().startCameraStream(dashboard, 30);
+        FtcDashboard.getInstance().startCameraStream(dashboard, 15);
+        //FIXME: disable during comp visionPortal.stopLiveView();
+
     }
+
+    public void enableDetection(boolean enabled) {
+        visionPortal.setProcessorEnabled(sampleDetection, enabled);
+    }
+
+
+
+
+
+
 
     public static class CameraStreamProcessor implements VisionProcessor, CameraStreamSource {
         private final AtomicReference<Bitmap> lastFrame =

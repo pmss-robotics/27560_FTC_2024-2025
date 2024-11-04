@@ -13,10 +13,12 @@ import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
+import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.commands.AutoAlignRoutine;
 import org.firstinspires.ftc.teamcode.commands.BucketRoutine;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
@@ -27,6 +29,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.util.States;
 
 
@@ -41,6 +44,7 @@ public class TeleOp extends CommandOpMode {
     ArmExtensionSubsystem armExt;
     ArmPivotSubsystem armPivot;
     ClawSubsystem claw;
+    VisionSubsystem vision;
 
     public static int bucketDropTimeout;
 
@@ -74,6 +78,7 @@ public class TeleOp extends CommandOpMode {
         armPivot.setDefaultCommand(new RunCommand(armPivot::holdPosition));
 
         claw = new ClawSubsystem(hardwareMap, telemetry);
+        vision = new VisionSubsystem(hardwareMap, telemetry);
 
         SequentialCommandGroup returnHome = new SequentialCommandGroup(
                 new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
@@ -134,12 +139,14 @@ public class TeleOp extends CommandOpMode {
                 () -> currentState != States.Global.specimen
         ));
 
-        // auto align
-        //new GamepadButton(tools, GamepadKeys.Button.LEFT_BUMPER).
-
         new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER).whenPressed(new SelectCommand(
             this::bumper
         ));
+
+        //auto align function
+        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER)
+                .and(new Trigger(() -> currentState == States.Global.intake_far || currentState == States.Global.intake_near))
+                .whenActive(new AutoAlignRoutine(vision, claw, drive, armExt));
 
 
 
