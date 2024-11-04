@@ -5,30 +5,45 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
+import com.arcrobotics.ftclib.command.SelectCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.commands.ActionCommand;
+import org.firstinspires.ftc.teamcode.commands.BucketRoutine;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
+import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
+import org.firstinspires.ftc.teamcode.commands.SpecimenRoutine;
 import org.firstinspires.ftc.teamcode.drive.Drawing;
 import org.firstinspires.ftc.teamcode.drive.PinpointDrive;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+import org.firstinspires.ftc.teamcode.util.States;
 
 
 //hello
 @Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOP", group = "TeleOp")
 public class TeleOp extends CommandOpMode {
-    public static double servoIncrement = 0.002;
-    public static double servoSpeed = 0.5;
+    States.Global currentState = States.Global.home;
+
+    GamepadEx driver, tools;
+    DriveSubsystem drive;
+    ArmExtensionSubsystem armExt;
+    ArmPivotSubsystem armPivot;
+    ClawSubsystem claw;
+
+    public static int bucketDropTimeout;
+
     @Override
     public void initialize() {
         // data sent to telemetry shows up on dashboard and driverGamepad station
@@ -37,10 +52,10 @@ public class TeleOp extends CommandOpMode {
         telemetry.log().setDisplayOrder(Telemetry.Log.DisplayOrder.NEWEST_FIRST);
         telemetry.log().setCapacity(8);
         // GamepadEx wraps gamepad 1 or 2 for easier implementations of more complex key bindings
-        GamepadEx driver = new GamepadEx(gamepad1);
-        GamepadEx tools = new GamepadEx(gamepad2);
+        driver = new GamepadEx(gamepad1);
+        tools = new GamepadEx(gamepad2);
         // The driveSubsystem wraps Roadrunner's MecanumDrive to combine with Commands.
-        DriveSubsystem drive = new DriveSubsystem(new PinpointDrive(hardwareMap, new Pose2d(0, 0, 0)), telemetry);
+        drive = new DriveSubsystem(new PinpointDrive(hardwareMap, new Pose2d(0, 0, 0)), telemetry);
         // The driveCommand uses methods defined in the DriveSubsystem to create behaviour.
         // we're passing in methods to get values instead of straight values because it avoids
         // disturbing the structure of the CommandOpMode. The aim is to define bindings in this
@@ -52,11 +67,83 @@ public class TeleOp extends CommandOpMode {
                 () -> -driver.getRightX(),
                 true);
 
-        ArmExtensionSubsystem armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
+        armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
         armExt.setDefaultCommand( new RunCommand(armExt::holdPosition));
 
-        ArmPivotSubsystem armPivot = new ArmPivotSubsystem(hardwareMap, telemetry, armExt.extensions::getCurrentPosition);
+        armPivot = new ArmPivotSubsystem(hardwareMap, telemetry, armExt.extensions::getCurrentPosition);
         armPivot.setDefaultCommand(new RunCommand(armPivot::holdPosition));
+
+        claw = new ClawSubsystem(hardwareMap, telemetry);
+
+        SequentialCommandGroup returnHome = new SequentialCommandGroup(
+                new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                new InstantCommand(() -> claw.setFingerState(States.Finger.closed), claw),
+                new PIDMoveCommand(armExt, States.ArmExtension.home),
+                new PIDMoveCommand(armPivot, States.ArmPivot.intake),
+                swapState(States.Global.home)
+        );
+        // far intake
+        new GamepadButton(tools, GamepadKeys.Button.B).whenPressed(new ConditionalCommand(
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                        new InstantCommand(() -> claw.setFingerState(States.Finger.opened), claw),
+                        new PIDMoveCommand(armPivot, States.ArmPivot.intake),
+                        new PIDMoveCommand(armExt, States.ArmExtension.intake),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
+                        swapState(States.Global.intake_far)
+                ),
+                returnHome,
+                () -> currentState != States.Global.intake_far
+        ));
+        // near intake
+        new GamepadButton(tools, GamepadKeys.Button.A).whenPressed(new ConditionalCommand(
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                        new InstantCommand(() -> claw.setFingerState(States.Finger.opened), claw),
+                        new PIDMoveCommand(armPivot, States.ArmPivot.intake),
+                        new PIDMoveCommand(armExt, States.ArmExtension.home),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
+                        swapState(States.Global.intake_near)
+                ),
+                returnHome,
+                () -> currentState != States.Global.intake_near
+        ));
+        // bucket
+        new GamepadButton(tools, GamepadKeys.Button.X).whenPressed(new ConditionalCommand(
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                        new InstantCommand(() -> claw.setFingerState(States.Finger.closed), claw),
+                        new PIDMoveCommand(armPivot, States.ArmPivot.bucket),
+                        new PIDMoveCommand(armExt, States.ArmExtension.bucket),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.bucket), claw),
+                        swapState(States.Global.bucket)
+                ),
+                returnHome,
+                () -> currentState != States.Global.bucket
+        ));
+        // specimen
+        new GamepadButton(tools, GamepadKeys.Button.Y).whenPressed(new ConditionalCommand(
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                        new InstantCommand(() -> claw.setFingerState(States.Finger.closed), claw),
+                        new PIDMoveCommand(armPivot, States.ArmPivot.specimen),
+                        new PIDMoveCommand(armExt, States.ArmExtension.specimen_1),
+                        swapState(States.Global.specimen)
+                ),
+                returnHome,
+                () -> currentState != States.Global.specimen
+        ));
+
+        // auto align
+        //new GamepadButton(tools, GamepadKeys.Button.LEFT_BUMPER).
+        // interface
+        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER).whenPressed(new SelectCommand(
+
+        ));
+
+
+
+
 
         /*
         control objectives:
@@ -73,52 +160,6 @@ public class TeleOp extends CommandOpMode {
         + i.e. we can go from close intake to low bucket without going thru home.
          */
 
-
-        /*
-        GenericMotorSubsystem genericMotorSubsystem = new GenericMotorSubsystem(hardwareMap, telemetry, "intakeMotor");
-        genericMotorSubsystem.setDefaultCommand(new RunCommand(
-                () -> genericMotorSubsystem.setPower(tools.getRightY()),
-                genericMotorSubsystem
-        ));
-
-        GenericPositionServoSubsystem genericPositionServoSubsystem = new GenericPositionServoSubsystem(hardwareMap, telemetry, "servo", 0.5);
-        genericPositionServoSubsystem.setDefaultCommand(new RunCommand(
-                () -> genericPositionServoSubsystem.setPosition(genericPositionServoSubsystem.position),
-                genericPositionServoSubsystem
-        ));
-        new GamepadButton(tools, GamepadKeys.Button.LEFT_BUMPER)
-                .whileHeld(new InstantCommand(
-                        () -> genericPositionServoSubsystem.incrementPosition(-servoIncrement),
-                        genericPositionServoSubsystem
-                ));
-        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER)
-                .whileHeld(new InstantCommand(
-                        () -> genericPositionServoSubsystem.incrementPosition(servoIncrement),
-                        genericPositionServoSubsystem
-                ));
-
-        GenericContinuousServoSubsystem genericContinuousServoSubsystem = new GenericContinuousServoSubsystem(hardwareMap, telemetry, "servo");
-        // to trigger you can do something similar to whats done in genericMotorSubsystem or...
-        new GamepadButton(tools, GamepadKeys.Button.A).toggleWhenPressed(
-                new InstantCommand(
-                    () -> genericContinuousServoSubsystem.setPower(0.5+servoSpeed),
-                    genericContinuousServoSubsystem),
-                new InstantCommand(
-                        () -> genericContinuousServoSubsystem.setPower(0.5),
-                        genericContinuousServoSubsystem)
-        );
-        new GamepadButton(tools, GamepadKeys.Button.B).toggleWhenPressed(
-                new InstantCommand(
-                        () -> genericContinuousServoSubsystem.setPower(0.5-servoSpeed),
-                        genericContinuousServoSubsystem),
-                new InstantCommand(
-                        () -> genericContinuousServoSubsystem.setPower(0.5),
-                        genericContinuousServoSubsystem)
-        );
-
-         */
-
-
         // sample for action and command synergy and binding
         // try to avoid this kind of usage as much as possible
         //SampleMechanism sampleMechanism = new SampleMechanism(hardwareMap);
@@ -133,6 +174,7 @@ public class TeleOp extends CommandOpMode {
             telemetry.addData("x", pose.position.x);
             telemetry.addData("y",pose.position.y);
             telemetry.addData("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
+            telemetry.addData("Current State:", currentState.name());
             telemetry.update();
 
             packet.fieldOverlay().setStroke("#3F51B5");
@@ -140,6 +182,23 @@ public class TeleOp extends CommandOpMode {
             FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }));
         schedule(driveCommand);
+    }
+
+    public InstantCommand swapState(States.Global state) {
+        return new InstantCommand(() -> currentState = state);
+    }
+    public Command bumper() {
+        switch (currentState) {
+            case intake_far:
+            case intake_near:
+                return new InstantCommand(claw::toggleFingerState, claw);
+            case bucket:
+                return new BucketRoutine(claw);
+            case specimen:
+                return new SpecimenRoutine(claw, armExt);
+            default:
+                return new InstantCommand();
+        }
     }
 
 

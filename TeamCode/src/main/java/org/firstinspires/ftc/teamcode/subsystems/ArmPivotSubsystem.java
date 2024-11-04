@@ -25,12 +25,12 @@ public class ArmPivotSubsystem extends SubsystemBase {
     public static double P = 0, I = 0, D = 0;
     public static double kCos = 0,kExt;
     public static double ticksPerRev = 0;
-    public static int pBucket = 0, pSpecimen = 0, pIntake = 0;
+    public static int pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 0;
 
     public static int target = 0;
     private States.ArmPivot currentState;
 
-    private PIDController pidController;
+    public PIDController pidController;
     private VoltageSensor voltageSensor;
 
     public ArmPivotSubsystem(HardwareMap hardwareMap, Telemetry telemetry, IntSupplier extensionAmount) {
@@ -56,7 +56,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
     }
 
     public void moveTo(int target){
-        this.target = target;
+        ArmPivotSubsystem.target = target;
         holdPosition();
     }
 
@@ -83,6 +83,9 @@ public class ArmPivotSubsystem extends SubsystemBase {
                 break;
             case specimen:
                 moveTo(pSpecimen);
+                break;
+            case start:
+                moveTo(pStart);
                 break;
         }
     }

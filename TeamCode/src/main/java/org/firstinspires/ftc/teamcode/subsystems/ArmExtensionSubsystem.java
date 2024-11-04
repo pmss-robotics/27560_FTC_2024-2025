@@ -19,11 +19,12 @@ public class ArmExtensionSubsystem extends SubsystemBase {
 
     public static double P = 0, I = 0, D = 0;
     public static double kSpring = 0;
-    public static int pHome = 0, pIntake = 0, pSpecimen = 0, pBucket = 0;
+    public static int pHome = 0, pIntake = 0, pSpecimen = 0, pBucket = 0, pStart = 0;
+    public static int pSpecimen_offset = 0;
 
     public static int target = 0;
 
-    private PIDController pidController;
+    public PIDController pidController;
     private VoltageSensor voltageSensor;
     private States.ArmExtension currentState;
 
@@ -50,7 +51,7 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     }
 
     public void moveTo(int target){
-        this.target = target;
+        ArmExtensionSubsystem.target = target;
         holdPosition();
     }
 
@@ -75,11 +76,16 @@ public class ArmExtensionSubsystem extends SubsystemBase {
             case intake:
                 moveTo(pIntake);
                 break;
-            case specimen:
+            case specimen_1:
                 moveTo(pSpecimen);
                 break;
+            case specimen_2:
+                moveTo(pSpecimen + pSpecimen_offset);
             case home:
                 moveTo(pHome);
+                break;
+            case start:
+                moveTo(pStart);
                 break;
         }
     }

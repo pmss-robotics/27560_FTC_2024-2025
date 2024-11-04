@@ -30,8 +30,8 @@ public class ClawSubsystem extends SubsystemBase {
     public static double F_target = 0, H_target = 0, W_target = 0; // in degrees
 
     private States.Claw currentClawState;
-    public static int wpHome, wpBucket = 0, wpSpecimen = 0, wpIntake = 0; // in degrees
-    public static int hpHome, hpBucket = 0, hpSpecimen = 0, hpIntake = 0; // in degrees
+    public static int wpHome, wpBucket = 0, wpSpecimen = 0, wpIntake = 0, wpStart = 0; // in degrees
+    public static int hpHome, hpBucket = 0, hpSpecimen = 0, hpIntake = 0, hpStart = 0; // in degrees
 
     private States.Finger currentFingerState;
     public static int pClosed = 0, pOpen = 0; // in degrees
@@ -65,6 +65,19 @@ public class ClawSubsystem extends SubsystemBase {
         return currentFingerState == States.Finger.opened;
     }
 
+    public void toggleFingerState() {
+        switch (currentFingerState) {
+            case opened:
+                finger.setPosition(pClosed);
+                currentFingerState = States.Finger.closed;
+                break;
+            case closed:
+                finger.setPosition(pOpen);
+                currentFingerState = States.Finger.opened;
+                break;
+        }
+    }
+
     public void setFingerState(States.Finger state) {
         currentFingerState = state;
         switch (currentFingerState) {
@@ -96,10 +109,11 @@ public class ClawSubsystem extends SubsystemBase {
                 hand.setPosition(hpBucket);
                 wrist.setPosition(wpBucket);
                 break;
+            case start:
+
         }
     }
 
-    // TODO: implement auto-align function (maybe it's actually should be a command)
 
     @Override
     public void periodic() {
