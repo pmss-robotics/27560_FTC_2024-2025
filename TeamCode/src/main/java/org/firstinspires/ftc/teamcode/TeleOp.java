@@ -136,9 +136,9 @@ public class TeleOp extends CommandOpMode {
 
         // auto align
         //new GamepadButton(tools, GamepadKeys.Button.LEFT_BUMPER).
-        // interface
-        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER).whenPressed(new SelectCommand(
 
+        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER).whenPressed(new SelectCommand(
+            this::bumper
         ));
 
 
@@ -159,13 +159,6 @@ public class TeleOp extends CommandOpMode {
         + each position should be reached by at most 1 motion.
         + i.e. we can go from close intake to low bucket without going thru home.
          */
-
-        // sample for action and command synergy and binding
-        // try to avoid this kind of usage as much as possible
-        //SampleMechanism sampleMechanism = new SampleMechanism(hardwareMap);
-        //Set<Subsystem> subsystemSet = Stream.of(drive).collect(Collectors.toSet());
-        // the binding for whenPressed() is convenient since it only activates once even when A is held down.
-        //driverGamepad.getGamepadButton(GamepadKeys.Button.A).whenPressed(new ActionCommand(sampleMechanism.doSampleMechanismAction(), subsystemSet));
 
 
         schedule(new RunCommand(() -> {

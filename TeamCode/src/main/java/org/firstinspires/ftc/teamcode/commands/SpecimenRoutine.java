@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.util.States;
 public class SpecimenRoutine extends SequentialCommandGroup {
     public SpecimenRoutine(ClawSubsystem claw, ArmExtensionSubsystem extension) {
         addCommands(
-                // pull down
                 new PIDMoveCommand(extension, States.ArmExtension.specimen_2),
                 new InstantCommand(() -> claw.setFingerState(States.Finger.opened), claw),
                 new InstantCommand(() -> claw.setClawState(States.Claw.home), claw)
