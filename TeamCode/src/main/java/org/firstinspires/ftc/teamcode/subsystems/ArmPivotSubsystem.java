@@ -6,6 +6,9 @@ import com.arcrobotics.ftclib.controller.PIDController;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
@@ -19,7 +22,8 @@ import java.util.function.IntSupplier;
 @Config
 public class ArmPivotSubsystem extends SubsystemBase {
     Telemetry telemetry;
-    MotorGroup pivots;
+    // left pivot is the lead motor
+    DcMotorEx leftPivot, rightPivot;
     IntSupplier extensionAmount;
 
     public static double P = 0, I = 0, D = 0;
@@ -39,12 +43,12 @@ public class ArmPivotSubsystem extends SubsystemBase {
         this.extensionAmount = extensionAmount;
         currentState = States.ArmPivot.intake;
 
-        MotorEx leftPivot = new MotorEx(hardwareMap, "leftPivot", Motor.GoBILDA.RPM_435);
-        MotorEx rightPivot = new MotorEx(hardwareMap, "rightPivot");
-        rightPivot.setInverted(true);
-        pivots = new MotorGroup(leftPivot, rightPivot);
-        pivots.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        pivots.stopAndResetEncoder();
+        leftPivot = hardwareMap.get(DcMotorEx.class, "leftPivot");
+        rightPivot = hardwareMap.get(DcMotorEx.class, "rightPivot");
+        rightPivot.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         pidController = new PIDController(P, I, D);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -52,7 +56,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         telemetry.addData("Pivot Target: ", target);
-        telemetry.addData("Pivot Pos: ", pivots.getCurrentPosition());
+        telemetry.addData("Pivot Pos: ", leftPivot.getCurrentPosition());
     }
 
     public void moveTo(int target){
@@ -61,11 +65,15 @@ public class ArmPivotSubsystem extends SubsystemBase {
     }
 
     public void holdPosition() {
-        pivots.set(calculate());
+        double power = calculate();
+        leftPivot.setPower(power);
+        rightPivot.setPower(power);
     }
     public void manual(double power) {
-        pivots.set(calculate() + power);
-        target = pivots.getCurrentPosition();
+        double p = calculate();
+        leftPivot.setPower(p + power);
+        rightPivot.setPower(p + power);
+        target = leftPivot.getCurrentPosition();
     }
 
     public States.ArmPivot getCurrentState() {
@@ -92,7 +100,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
 
     private double calculate() {
         pidController.setPID(P,I,D);
-        int current = pivots.getCurrentPosition();
+        int current = leftPivot.getCurrentPosition();
 
         double power = pidController.calculate(current, target);
         power += kCos * Math.cos(target / ticksPerRev) + kExt * extensionAmount.getAsInt();

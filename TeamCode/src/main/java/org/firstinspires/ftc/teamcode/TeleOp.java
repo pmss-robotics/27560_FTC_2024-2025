@@ -72,13 +72,17 @@ public class TeleOp extends CommandOpMode {
                 true);
 
         armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
-        armExt.setDefaultCommand( new RunCommand(armExt::holdPosition));
+        armExt.setDefaultCommand(new RunCommand(armExt::holdPosition, armExt));
 
-        armPivot = new ArmPivotSubsystem(hardwareMap, telemetry, armExt.extensions::getCurrentPosition);
-        armPivot.setDefaultCommand(new RunCommand(armPivot::holdPosition));
+        armPivot = new ArmPivotSubsystem(hardwareMap, telemetry, armExt.leftExtension::getCurrentPosition);
+        armPivot.setDefaultCommand(new RunCommand(armPivot::holdPosition, armPivot));
 
         claw = new ClawSubsystem(hardwareMap, telemetry);
-        vision = new VisionSubsystem(hardwareMap, telemetry);
+        try {
+            vision = new VisionSubsystem(hardwareMap, telemetry);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         SequentialCommandGroup returnHome = new SequentialCommandGroup(
                 new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),

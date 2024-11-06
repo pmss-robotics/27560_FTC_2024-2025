@@ -3,9 +3,8 @@ package org.firstinspires.ftc.teamcode.subsystems;
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDController;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.arcrobotics.ftclib.hardware.motors.MotorEx;
-import com.arcrobotics.ftclib.hardware.motors.MotorGroup;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
 
@@ -15,7 +14,7 @@ import org.firstinspires.ftc.teamcode.util.States;
 @Config
 public class ArmExtensionSubsystem extends SubsystemBase {
     Telemetry telemetry;
-    public MotorGroup extensions;
+    public DcMotorEx leftExtension, rightExtension;
 
     public static double P = 0, I = 0, D = 0;
     public static double kSpring = 0;
@@ -34,12 +33,12 @@ public class ArmExtensionSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         currentState = States.ArmExtension.home;
 
-        MotorEx leftExtension = new MotorEx(hardwareMap, "leftExtension");
-        MotorEx rightExtension = new MotorEx(hardwareMap, "rightExtension");
-        rightExtension.setInverted(true);
-        extensions = new MotorGroup(leftExtension, rightExtension);
-        extensions.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        extensions.stopAndResetEncoder();
+        leftExtension = hardwareMap.get(DcMotorEx.class, "leftExtension");
+        rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension");
+        rightExtension.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        leftExtension.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightExtension.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         pidController = new PIDController(P, I, D);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
@@ -47,7 +46,7 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         telemetry.addData("Extension Target: ", target);
-        telemetry.addData("Extension Pos: ", extensions.getCurrentPosition());
+        telemetry.addData("Extension Pos: ", leftExtension.getCurrentPosition());
     }
 
     public void moveTo(int target){
@@ -56,11 +55,15 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     }
 
     public void holdPosition() {
-        extensions.set(calculate());
+        double power = calculate();
+        leftExtension.setPower(power);
+        rightExtension.setPower(power);
     }
     public void manual(double power) {
-        extensions.set(calculate() + power);
-        target = extensions.getCurrentPosition();
+        double p = calculate() + power;
+        leftExtension.setPower(p);
+        rightExtension.setPower(p);
+        target = leftExtension.getCurrentPosition();
     }
 
     public States.ArmExtension getCurrentState() {
@@ -92,7 +95,7 @@ public class ArmExtensionSubsystem extends SubsystemBase {
 
     private double calculate() {
         pidController.setPID(P,I,D);
-        int current = extensions.getCurrentPosition();
+        int current = leftExtension.getCurrentPosition();
 
         double power = kSpring - pidController.calculate(current, target);
         // we are subtracting the PID since the springs are constantly trying to extend the arm
