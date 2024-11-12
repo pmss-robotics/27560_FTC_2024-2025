@@ -52,6 +52,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
 
         pidController = new PIDController(P, I, D);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
+        target = leftPivot.getCurrentPosition();
     }
     @Override
     public void periodic() {

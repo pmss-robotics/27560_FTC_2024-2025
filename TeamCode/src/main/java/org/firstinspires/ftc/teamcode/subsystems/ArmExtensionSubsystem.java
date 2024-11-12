@@ -49,6 +49,7 @@ public class ArmExtensionSubsystem extends SubsystemBase {
 
         pidController = new PIDController(P, I, D);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
+        target = leftExtension.getCurrentPosition();
     }
     @Override
     public void periodic() {
