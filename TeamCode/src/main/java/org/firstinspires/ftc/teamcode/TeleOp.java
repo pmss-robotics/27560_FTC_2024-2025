@@ -65,6 +65,7 @@ public class TeleOp extends CommandOpMode {
         // disturbing the structure of the CommandOpMode. The aim is to define bindings in this
         // initialize() method through Commands and these will be looped and acted in the (hidden)
         // run() loop.
+
         DriveCommand driveCommand = new DriveCommand(drive,
                 () -> -driver.getLeftX(),
                 () -> -driver.getLeftY(),
@@ -170,6 +171,7 @@ public class TeleOp extends CommandOpMode {
         + each position should be reached by at most 1 motion.
         + i.e. we can go from close intake to low bucket without going thru home.
          */
+        //TODO add reset keys like home-ing the arm and extension
 
 
         schedule(new RunCommand(() -> {

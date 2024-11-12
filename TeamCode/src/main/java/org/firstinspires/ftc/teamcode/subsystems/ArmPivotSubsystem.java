@@ -109,4 +109,11 @@ public class ArmPivotSubsystem extends SubsystemBase {
         telemetry.addData("Pivot Power:", power);
         return power;
     }
+
+    public void resetEncoder() {
+        leftPivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightPivot.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftPivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightPivot.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 }
