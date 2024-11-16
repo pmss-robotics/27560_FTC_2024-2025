@@ -33,8 +33,10 @@ public class PinpointDrive extends MecanumDrive {
          */
         //These are tuned for 3110-0002-0001 Product Insight #1
         // RR localizer note: These units are inches, presets are converted from mm (which is why they are inexact)
-        public double xOffset = -3.3071;
-        public double yOffset = -6.6142;
+        // 15.75mm
+        public double xOffset = 0.6200787;
+        //0 mm
+        public double yOffset = 0;
 
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either

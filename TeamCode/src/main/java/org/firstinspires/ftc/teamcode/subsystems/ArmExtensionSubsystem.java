@@ -36,7 +36,6 @@ public class ArmExtensionSubsystem extends SubsystemBase {
 
         leftExtension = hardwareMap.get(DcMotorEx.class, "leftExtension");
         rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension");
-        rightExtension.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftExtension.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightExtension.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);

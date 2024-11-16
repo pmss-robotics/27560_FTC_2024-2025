@@ -49,6 +49,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
 
         leftPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        resetEncoder();
 
         pidController = new PIDController(P, I, D);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();

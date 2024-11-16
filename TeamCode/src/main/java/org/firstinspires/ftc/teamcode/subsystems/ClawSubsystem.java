@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.util.Range;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.util.States;
 
+import java.lang.annotation.Target;
 import java.util.Objects;
 
 // https://docs.ftclib.org/ftclib/command-base/command-system/subsystems
@@ -30,11 +31,11 @@ public class ClawSubsystem extends SubsystemBase {
     public static double F_target = 0, H_target = 0, W_target = 0; // in degrees
 
     private States.Claw currentClawState;
-    public static int wpHome, wpBucket = 0, wpSpecimen = 0, wpIntake = 0, wpStart = 0; // in degrees
-    public static int hpHome, hpBucket = 0, hpSpecimen = 0, hpIntake = 0, hpStart = 0; // in degrees
+    public static int wpHome = 0, wpBucket = 0, wpSpecimen = 0, wpIntake = 0, wpStart = 150; // in degrees
+    public static int hpHome = 0, hpBucket = 0, hpSpecimen = 0, hpIntake = 0, hpStart = 150; // in degrees
 
     private States.Finger currentFingerState;
-    public static int pClosed = 0, pOpen = 0; // in degrees
+    public static int pClosed = 138, pOpen = 185; // in degrees
 
     public ClawSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         // initialize hardware here alongside other parameters
@@ -49,12 +50,22 @@ public class ClawSubsystem extends SubsystemBase {
         hand.setPwmRange(new PwmControl.PwmRange(500, 2500));
         wrist.setPwmRange(new PwmControl.PwmRange(500, 2500));
 
+        F_target = pClosed;
+        H_target = hpStart;
+        W_target = wpStart;
+
         finger.setPosition(scale(F_target));
         hand.setPosition(scale(H_target));
         wrist.setPosition(scale(W_target));
 
         currentClawState = States.Claw.home;
         currentFingerState = States.Finger.closed;
+    }
+
+    public void holdPosition() {
+        finger.setPosition(scale(F_target));
+        hand.setPosition(scale(H_target));
+        wrist.setPosition(scale(W_target));
     }
 
     public States.Claw getCurrentClawState() {
@@ -68,52 +79,54 @@ public class ClawSubsystem extends SubsystemBase {
     public void toggleFingerState() {
         switch (currentFingerState) {
             case opened:
-                finger.setPosition(pClosed);
+                F_target = pClosed;
                 currentFingerState = States.Finger.closed;
                 break;
             case closed:
-                finger.setPosition(pOpen);
+                F_target = pOpen;
                 currentFingerState = States.Finger.opened;
                 break;
         }
+        finger.setPosition(F_target);
     }
 
     public void setFingerState(States.Finger state) {
         currentFingerState = state;
         switch (currentFingerState) {
             case opened:
-                finger.setPosition(pClosed);
+                F_target = pOpen;
                 break;
             case closed:
-                finger.setPosition(pOpen);
+                F_target = pClosed;
                 break;
         }
+        finger.setPosition(F_target);
     }
 
     public void setClawState(States.Claw state) {
         currentClawState = state;
         switch (currentClawState) {
             case home:
-                hand.setPosition(hpHome);
-                wrist.setPosition(wpHome);
+                H_target = hpHome;
+                W_target = wpHome;
                 break;
             case intake:
-                hand.setPosition(hpIntake);
-                wrist.setPosition(wpIntake);
+                H_target = hpIntake;
+                W_target = wpIntake;
                 break;
             case specimen:
-                hand.setPosition(hpSpecimen);
-                wrist.setPosition(wpSpecimen);
+                H_target = hpSpecimen;
+                W_target = wpSpecimen;
                 break;
             case bucket:
-                hand.setPosition(hpBucket);
-                wrist.setPosition(wpBucket);
+                H_target = hpBucket;
+                W_target = wpBucket;
                 break;
             case start:
-
         }
+        hand.setPosition(H_target);
+        wrist.setPosition(W_target);
     }
-
 
     @Override
     public void periodic() {
