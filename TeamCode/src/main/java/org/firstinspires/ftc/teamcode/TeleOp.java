@@ -45,8 +45,9 @@ public class TeleOp extends CommandOpMode {
     ArmPivotSubsystem armPivot;
     ClawSubsystem claw;
     VisionSubsystem vision;
+    public static double tempRot1 = 0;
+    public static double tempRot2 = 150;
 
-    public static int bucketDropTimeout;
 
     @Override
     public void initialize() {
@@ -158,6 +159,17 @@ public class TeleOp extends CommandOpMode {
                 .whenActive(new AutoAlignRoutine(vision, claw, drive, armExt));
 
          */
+        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER)
+                .toggleWhenPressed(
+                        new InstantCommand(() -> ClawSubsystem.W_target = tempRot1),
+                        new InstantCommand(() -> ClawSubsystem.W_target = tempRot2)
+                );
+
+        new GamepadButton(driver, GamepadKeys.Button.A)
+                .whenPressed(new InstantCommand(armPivot::resetEncoder, armPivot));
+
+        new GamepadButton(driver, GamepadKeys.Button.B)
+                .whenPressed(new InstantCommand(armExt::resetEncoder, armPivot));
 
 
 

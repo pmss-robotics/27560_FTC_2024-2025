@@ -111,4 +111,10 @@ public class ArmExtensionSubsystem extends SubsystemBase {
         telemetry.addData("Extension Power:", power);
         return power;
     }
+    public void resetEncoder() {
+        leftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 }
