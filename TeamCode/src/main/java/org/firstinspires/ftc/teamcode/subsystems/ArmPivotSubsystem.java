@@ -28,7 +28,8 @@ public class ArmPivotSubsystem extends SubsystemBase {
 
     public static double P = 0.025, I = 0, D = 0.005;
     public static double kCos = 0.02, kExt = 0;
-    public static double ticksPerRev = 1816;
+    public static int ticksPerRev = 1816;
+    public static int ticksFromPerp = 30;
     public static int pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 200;
 
     public static int target = 0;
@@ -112,9 +113,13 @@ public class ArmPivotSubsystem extends SubsystemBase {
         int current = leftPivot.getCurrentPosition();
 
         double power = pidController.calculate(current, target);
-        power += kCos * Math.cos((2* Math.PI * (current-31) / ticksPerRev)) + kExt * extensionAmount.getAsInt();
+        double angle = (2 * Math.PI * (current-ticksFromPerp)) / ticksPerRev;
+
+        power += kCos * Math.cos(angle) + kExt * extensionAmount.getAsInt();
         power /= voltageSensor.getVoltage();
+
         telemetry.addData("Pivot Power:", "%.6f", power);
+        telemetry.addData("Pivot Angle:", Math.toDegrees(angle));
         return power;
     }
 

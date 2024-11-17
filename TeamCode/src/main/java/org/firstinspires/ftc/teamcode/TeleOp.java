@@ -68,9 +68,9 @@ public class TeleOp extends CommandOpMode {
         // run() loop.
 
         DriveCommand driveCommand = new DriveCommand(drive,
-                () -> -driver.getLeftX(),
-                () -> driver.getLeftY(),
-                () -> -driver.getRightX(),
+                () -> -driver.getLeftX() * driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER),
+                () -> driver.getLeftY() * driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER),
+                () -> -driver.getRightX() * driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER),
                 true);
 
         armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
@@ -189,7 +189,6 @@ public class TeleOp extends CommandOpMode {
         + each position should be reached by at most 1 motion.
         + i.e. we can go from close intake to low bucket without going thru home.
          */
-        //TODO add reset keys like home-ing the arm and extension
 
 
         schedule(new RunCommand(() -> {
