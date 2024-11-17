@@ -69,9 +69,9 @@ public class TeleOp extends CommandOpMode {
 
         DriveCommand driveCommand = new DriveCommand(drive,
                 () -> -driver.getLeftX(),
-                () -> -driver.getLeftY(),
+                () -> driver.getLeftY(),
                 () -> -driver.getRightX(),
-                false);
+                true);
 
         armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
         armExt.setDefaultCommand(new RunCommand(armExt::holdPosition, armExt));
@@ -161,8 +161,8 @@ public class TeleOp extends CommandOpMode {
          */
         new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER)
                 .toggleWhenPressed(
-                        new InstantCommand(() -> ClawSubsystem.W_target = tempRot1),
-                        new InstantCommand(() -> ClawSubsystem.W_target = tempRot2)
+                        new InstantCommand(() -> ClawSubsystem.H_target = tempRot1),
+                        new InstantCommand(() -> ClawSubsystem.H_target = tempRot2)
                 );
 
         new GamepadButton(driver, GamepadKeys.Button.A)
@@ -206,6 +206,23 @@ public class TeleOp extends CommandOpMode {
             FtcDashboard.getInstance().sendTelemetryPacket(packet);
         }));
         schedule(driveCommand);
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        initialize();
+
+        while (!isStarted()) {
+            armPivot.holdPosition();
+            armExt.holdPosition();
+        }
+        waitForStart();
+
+        // run the scheduler
+        while (!isStopRequested() && opModeIsActive()) {
+            run();
+        }
+        reset();
     }
 
     public InstantCommand swapState(States.Global state) {

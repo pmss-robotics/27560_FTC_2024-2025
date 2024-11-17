@@ -18,7 +18,7 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     public DcMotorEx leftExtension, rightExtension;
 
     public static double P = 0, I = 0, D = 0;
-    public static double kSpring = 0;
+    public static double kSpring = 0.01;
     public static int pHome = 0, pIntake = 0, pSpecimen = 0, pBucket = 0, pStart = 0;
     public static int pSpecimen_offset = 0;
 
@@ -35,20 +35,20 @@ public class ArmExtensionSubsystem extends SubsystemBase {
         currentState = States.ArmExtension.home;
 
         leftExtension = hardwareMap.get(DcMotorEx.class, "leftExtension");
-        rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension");
+        //rightExtension = hardwareMap.get(DcMotorEx.class, "rightExtension");
 
         leftExtension.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        rightExtension.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        //rightExtension.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         leftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         leftExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         pidController = new PIDController(P, I, D);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
-        target = leftExtension.getCurrentPosition();
+        target = pStart;
     }
     @Override
     public void periodic() {
@@ -64,12 +64,12 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     public void holdPosition() {
         double power = calculate();
         leftExtension.setPower(power);
-        rightExtension.setPower(power);
+        //rightExtension.setPower(power);
     }
     public void manual(double power) {
         double p = calculate() + power;
         leftExtension.setPower(p);
-        rightExtension.setPower(p);
+        //rightExtension.setPower(p);
         target = leftExtension.getCurrentPosition();
     }
 
@@ -113,8 +113,8 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     }
     public void resetEncoder() {
         leftExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //rightExtension.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //rightExtension.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
 }

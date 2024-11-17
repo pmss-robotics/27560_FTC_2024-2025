@@ -26,12 +26,13 @@ public class ArmPivotSubsystem extends SubsystemBase {
     DcMotorEx leftPivot, rightPivot;
     IntSupplier extensionAmount;
 
-    public static double P = 0, I = 0, D = 0;
-    public static double kCos = 0,kExt;
-    public static double ticksPerRev = 0;
-    public static int pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 0;
+    public static double P = 0.025, I = 0, D = 0.005;
+    public static double kCos = 0.02, kExt = 0;
+    public static double ticksPerRev = 1816;
+    public static int pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 200;
 
     public static int target = 0;
+    public static int max = 503;
     private States.ArmPivot currentState;
 
     public PIDController pidController;
@@ -53,7 +54,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
 
         pidController = new PIDController(P, I, D);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
-        target = leftPivot.getCurrentPosition();
+        target = pStart;
     }
     @Override
     public void periodic() {
@@ -72,10 +73,16 @@ public class ArmPivotSubsystem extends SubsystemBase {
         rightPivot.setPower(power);
     }
     public void manual(double power) {
-        double p = calculate();
-        leftPivot.setPower(p + power);
-        rightPivot.setPower(p + power);
         target = leftPivot.getCurrentPosition();
+        if(target > max) {
+            target = max-10;
+        } else if (target <= 0) {
+            target = 10;
+        }else {
+            double p = calculate();
+            leftPivot.setPower(p + power);
+            rightPivot.setPower(p + power);
+        }
     }
 
     public States.ArmPivot getCurrentState() {
@@ -105,10 +112,9 @@ public class ArmPivotSubsystem extends SubsystemBase {
         int current = leftPivot.getCurrentPosition();
 
         double power = pidController.calculate(current, target);
-        power += kCos * Math.cos(target / ticksPerRev) + kExt * extensionAmount.getAsInt();
+        power += kCos * Math.cos((2* Math.PI * (current-31) / ticksPerRev)) + kExt * extensionAmount.getAsInt();
         power /= voltageSensor.getVoltage();
-
-        telemetry.addData("Pivot Power:", power);
+        telemetry.addData("Pivot Power:", "%.6f", power);
         return power;
     }
 
