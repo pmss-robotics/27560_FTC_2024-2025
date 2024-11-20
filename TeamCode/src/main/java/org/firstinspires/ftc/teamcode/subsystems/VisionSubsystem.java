@@ -99,6 +99,19 @@ public class VisionSubsystem extends SubsystemBase {
     public void enableDetection(boolean enabled) {
         visionPortal.setProcessorEnabled(sampleDetection, enabled);
     }
+    /*
+
+    public double getSampleAngle() {
+        SampleDetectionVisionProcessor.AnalyzedStone nearestSample;
+        for (SampleDetectionVisionProcessor.AnalyzedStone sample : sampleDetection.getDetectedStones()) {
+            // find nearest sample to the claw centre.
+            // use the sample's tvec (translation vector) to do this.
+
+        }
+        return nearestSample.angle;
+    }
+
+     */
 
 
 

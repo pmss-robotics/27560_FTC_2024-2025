@@ -154,12 +154,12 @@ public class TeleOp extends CommandOpMode {
 
         //auto align function
         /*
-        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER)
+        new GamepadButton(tools, GamepadKeys.Button.LEFT_BUMPER)
                 .and(new Trigger(() -> currentState == States.Global.intake_far || currentState == States.Global.intake_near))
                 .whenActive(new AutoAlignRoutine(vision, claw, drive, armExt));
 
          */
-        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER)
+        new GamepadButton(tools, GamepadKeys.Button.LEFT_BUMPER)
                 .toggleWhenPressed(
                         new InstantCommand(() -> ClawSubsystem.H_target = tempRot1),
                         new InstantCommand(() -> ClawSubsystem.H_target = tempRot2)
@@ -210,6 +210,8 @@ public class TeleOp extends CommandOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
+
+        // retract to a position
 
         while (!isStarted()) {
             armPivot.holdPosition();
