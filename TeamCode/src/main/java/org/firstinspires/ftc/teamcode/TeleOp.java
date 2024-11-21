@@ -214,8 +214,8 @@ public class TeleOp extends CommandOpMode {
         // retract to a position
 
         while (!isStarted()) {
-            armPivot.holdPosition();
             armExt.holdPosition();
+            armPivot.holdPosition();
         }
         waitForStart();
 

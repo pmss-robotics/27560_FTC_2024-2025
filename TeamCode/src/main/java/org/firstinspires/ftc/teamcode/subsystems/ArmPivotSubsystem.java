@@ -26,7 +26,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
     DcMotorEx leftPivot, rightPivot;
     IntSupplier extensionAmount;
 
-    public static double P = 0.025, I = 0, D = 0.006;
+    public static double P = 0.025, I = 0, D = 0.004;
     public static double kCos = 0.042, kExt = 0;
     public static int ticksPerRev = 1772;
     public static int pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 200;
