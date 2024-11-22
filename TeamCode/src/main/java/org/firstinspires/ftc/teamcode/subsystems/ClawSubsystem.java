@@ -31,8 +31,8 @@ public class ClawSubsystem extends SubsystemBase {
     public static double F_target = 0, H_target = 0, W_target = 0; // in degrees
 
     private States.Claw currentClawState;
-    public static double wpHome = 0, wpBucket = 0, wpSpecimen = 0, wpIntake = 125, wpStart = 100; // in degrees
-    public static double hpHome = 75, hpBucket = 0, hpSpecimen = 0, hpIntake = 0, hpStart = 75; // in degrees
+    public static double wpHome = 125, wpBucket = 0, wpSpecimen = 0, wpIntake = 190, wpStart = 100; // in degrees
+    public static double hpHome = 75, hpBucket = 0, hpSpecimen = 0, hpIntake = 75, hpStart = 75; // in degrees
 
     private States.Finger currentFingerState;
     public static double pClosed = 152, pOpen = 185; // in degrees
@@ -87,7 +87,7 @@ public class ClawSubsystem extends SubsystemBase {
                 currentFingerState = States.Finger.opened;
                 break;
         }
-        finger.setPosition(F_target);
+        finger.setPosition(scale(F_target));
     }
 
     public void setFingerState(States.Finger state) {
@@ -100,7 +100,7 @@ public class ClawSubsystem extends SubsystemBase {
                 F_target = pClosed;
                 break;
         }
-        finger.setPosition(F_target);
+        finger.setPosition(scale(F_target));
     }
 
     public void setClawState(States.Claw state) {
@@ -124,8 +124,8 @@ public class ClawSubsystem extends SubsystemBase {
                 break;
             case start:
         }
-        hand.setPosition(H_target);
-        wrist.setPosition(W_target);
+        hand.setPosition(scale(H_target));
+        wrist.setPosition(scale(W_target));
     }
 
     @Override

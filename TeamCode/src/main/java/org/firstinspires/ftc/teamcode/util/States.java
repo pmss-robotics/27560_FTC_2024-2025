@@ -16,7 +16,8 @@ public class States {
         start,
         specimen,
         bucket,
-        intake
+        intake,
+        home,
     }
 
     public enum ArmExtension {

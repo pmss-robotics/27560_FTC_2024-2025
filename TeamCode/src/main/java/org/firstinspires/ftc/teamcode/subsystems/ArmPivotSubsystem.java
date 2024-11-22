@@ -27,9 +27,11 @@ public class ArmPivotSubsystem extends SubsystemBase {
     IntSupplier extensionAmount;
 
     public static double P = 0.025, I = 0, D = 0.004;
-    public static double kCos = 0.042, kExt = 0;
+    public static double kCos = 0.042, kExt = 0.000008;
     public static int ticksPerRev = 1772;
-    public static int pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 200;
+    public static int pHome = 0, pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 200;
+    public static double tolerance = 5;
+
 
     public static int target = 0;
     public static int max = 480;
@@ -53,6 +55,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
         resetEncoder();
 
         pidController = new PIDController(P, I, D);
+        pidController.setTolerance(tolerance);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
         target = pStart;
     }
@@ -104,11 +107,14 @@ public class ArmPivotSubsystem extends SubsystemBase {
             case start:
                 moveTo(pStart);
                 break;
+            case home:
+                moveTo(pHome);
         }
     }
 
     private double calculate() {
         pidController.setPID(P,I,D);
+        pidController.setTolerance(tolerance);
         int current = leftPivot.getCurrentPosition();
 
         double power = pidController.calculate(current, target);
