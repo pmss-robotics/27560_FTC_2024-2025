@@ -23,13 +23,13 @@ import java.util.function.IntSupplier;
 public class ArmPivotSubsystem extends SubsystemBase {
     Telemetry telemetry;
     // left pivot is the lead motor
-    DcMotorEx leftPivot, rightPivot;
+    public DcMotorEx leftPivot, rightPivot;
     IntSupplier extensionAmount;
 
     public static double P = 0.025, I = 0, D = 0.004;
     public static double kCos = 0.042, kExt = 0.000008;
     public static int ticksPerRev = 1772;
-    public static int pHome = 0, pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 200;
+    public static int pHome = 0, pBucket = 0, pSpecimen = 0, pIntake = 15, pStart = 200;
     public static double tolerance = 5;
 
 
@@ -109,6 +109,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
                 break;
             case home:
                 moveTo(pHome);
+                break;
         }
     }
 

@@ -87,7 +87,7 @@ public class ClawSubsystem extends SubsystemBase {
                 currentFingerState = States.Finger.opened;
                 break;
         }
-        finger.setPosition(scale(F_target));
+        fingerSetPosition(F_target);
     }
 
     public void setFingerState(States.Finger state) {
@@ -100,7 +100,7 @@ public class ClawSubsystem extends SubsystemBase {
                 F_target = pClosed;
                 break;
         }
-        finger.setPosition(scale(F_target));
+        fingerSetPosition(F_target);
     }
 
     public void setClawState(States.Claw state) {
@@ -124,8 +124,8 @@ public class ClawSubsystem extends SubsystemBase {
                 break;
             case start:
         }
-        hand.setPosition(scale(H_target));
-        wrist.setPosition(scale(W_target));
+        handSetPosition(H_target);
+        wristSetPosition(W_target);
     }
 
     @Override
@@ -138,6 +138,16 @@ public class ClawSubsystem extends SubsystemBase {
     private double scale(double angle){
         // angle in degrees
         return Range.scale(angle, 0, 300, 0, 1);
+    }
+
+    public void wristSetPosition(double target) {
+        wrist.setPosition(scale(target));
+    }
+    public void handSetPosition(double target) {
+        hand.setPosition(scale(target));
+    }
+    public void fingerSetPosition(double target) {
+        finger.setPosition(scale(target));
     }
 
 }

@@ -12,6 +12,7 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -165,12 +166,17 @@ public class TeleOp extends CommandOpMode {
                         new InstantCommand(() -> ClawSubsystem.H_target = tempRot2)
                 );
 
-        new GamepadButton(driver, GamepadKeys.Button.A)
-                .whenPressed(new InstantCommand(armPivot::resetEncoder, armPivot));
+        new GamepadButton(driver, GamepadKeys.Button.A).whenPressed(new SequentialCommandGroup(
+                new InstantCommand(() -> armPivot.setState(States.ArmPivot.home)),
+                new InstantCommand(()-> armPivot.leftPivot.setPower(0)),
+                new InstantCommand(()-> armPivot.rightPivot.setPower(0)),
+                new InstantCommand(armPivot::resetEncoder, armPivot)));
 
-        new GamepadButton(driver, GamepadKeys.Button.B)
-                .whenPressed(new InstantCommand(armExt::resetEncoder, armPivot));
 
+        new GamepadButton(driver, GamepadKeys.Button.B).whenPressed(new SequentialCommandGroup(
+                new InstantCommand(() -> ArmExtensionSubsystem.target = 0),
+                new InstantCommand(()-> armExt.leftExtension.setPower(0)),
+                new InstantCommand(armExt::resetEncoder, armExt)));
 
 
 
@@ -249,7 +255,7 @@ public class TeleOp extends CommandOpMode {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> claw.setFingerState(States.Finger.closed), claw),
                 new PIDMoveCommand(armExt, States.ArmExtension.home),
-                new PIDMoveCommand(armPivot, States.ArmPivot.intake),
+                new PIDMoveCommand(armPivot, States.ArmPivot.home),
                 new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
                 swapState(States.Global.home)
         );
