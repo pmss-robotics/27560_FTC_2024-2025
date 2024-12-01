@@ -23,9 +23,7 @@ public class StringTensioner extends CommandOpMode {
     GamepadEx gamepad;
 
     ArmExtensionSubsystem armExt;
-
-    public static int bucketDropTimeout;
-
+    
     @Override
     public void initialize() {
         // data sent to telemetry shows up on dashboard and driverGamepad station
