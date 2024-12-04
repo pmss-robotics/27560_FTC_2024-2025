@@ -102,7 +102,10 @@ public class TeleOp extends CommandOpMode {
                         new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
                         swapState(States.Global.intake_far)
                 ),
-                returnHome(),
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
+                        returnHome()
+                ),
                 () -> currentState != States.Global.intake_far
         ));
         // near intake

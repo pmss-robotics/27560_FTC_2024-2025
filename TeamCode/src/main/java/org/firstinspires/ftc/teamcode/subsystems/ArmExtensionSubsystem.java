@@ -24,7 +24,7 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     public static int pSpecimen_offset = 0;
 
     public static int target = 0;
-    public static double tolerance = 10;
+    public static double tolerance = 20;
 
     public PIDController pidController;
     private VoltageSensor voltageSensor;
