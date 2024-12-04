@@ -20,15 +20,13 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.teamcode.vision.SampleDetectionVisionProcessor;
-import org.firstinspires.ftc.teamcode.vision.SampleVisionProcessor;
+import org.firstinspires.ftc.teamcode.vision.enhancedSampleProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -38,7 +36,7 @@ public class VisionSubsystem extends SubsystemBase {
     public static int EXPOSURE_MS = 6;
     public static int GAIN = 190;
     //private final AprilTagProcessor aprilTag;
-    private final SampleDetectionVisionProcessor sampleDetection;
+    private final enhancedSampleProcessor sampleDetection;
     private final VisionPortal visionPortal;
     private Telemetry telemetry;
 
@@ -50,7 +48,7 @@ public class VisionSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         // TODO sample code!!!! re-implement in the field.
         final CameraStreamProcessor dashboard = new CameraStreamProcessor();
-        sampleDetection = new SampleDetectionVisionProcessor();
+        sampleDetection = new enhancedSampleProcessor();
         /*
         aprilTag = new AprilTagProcessor.Builder()
                 .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
@@ -99,19 +97,20 @@ public class VisionSubsystem extends SubsystemBase {
     public void enableDetection(boolean enabled) {
         visionPortal.setProcessorEnabled(sampleDetection, enabled);
     }
-    /*
+
 
     public double getSampleAngle() {
-        SampleDetectionVisionProcessor.AnalyzedStone nearestSample;
-        for (SampleDetectionVisionProcessor.AnalyzedStone sample : sampleDetection.getDetectedStones()) {
-            // find nearest sample to the claw centre.
-            // use the sample's tvec (translation vector) to do this.
-
+        double angle = 0;
+        enhancedSampleProcessor.DetectedSample closest = null;
+        for ( enhancedSampleProcessor.DetectedSample sample : sampleDetection.getDetectedSamples()) {
+            // find the sample closest to the claw
+            // sample.tvec.
         }
-        return nearestSample.angle;
+        if(Objects.isNull(closest)) return 666;
+        return angle;
     }
 
-     */
+
 
 
 

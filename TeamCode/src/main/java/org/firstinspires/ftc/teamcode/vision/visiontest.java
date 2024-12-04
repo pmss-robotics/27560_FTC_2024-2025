@@ -15,7 +15,7 @@ public class visiontest extends LinearOpMode {
     /**
      * The variable to store our instance of the AprilTag processor.
      */
-    private SampleDetectionVisionProcessor sampleDetectionVisionProcessor;
+    private enhancedSampleProcessor sampleDetectionVisionProcessor;
 
     /**
      * The variable to store our instance of the vision portal.
@@ -24,18 +24,15 @@ public class visiontest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        sampleDetectionVisionProcessor = new SampleDetectionVisionProcessor();
+        sampleDetectionVisionProcessor = new enhancedSampleProcessor();
         telemetry.log().setCapacity(20);
         telemetry.log().add("hi", "hi");
         telemetry.update();
         visionPortal = VisionPortal.easyCreateWithDefaults(
                 hardwareMap.get(WebcamName.class, "C:\\Users\\jeffx\\Downloads\\samplesss.jpg"), sampleDetectionVisionProcessor);
 
-        for (SampleDetectionVisionProcessor.AnalyzedStone sample : sampleDetectionVisionProcessor.getDetectedStones()){
-            telemetry.log().add("tvec: " + sample.color.toString() + " : ",  sample.tvec.toString());
-            telemetry.log().add("1", "1");
-            telemetry.update();
-        }
+
+        telemetry.addData("help", sampleDetectionVisionProcessor.getDetectedSamples().toString());
         telemetry.update();
 
         // Wait for the DS start button to be touched.``

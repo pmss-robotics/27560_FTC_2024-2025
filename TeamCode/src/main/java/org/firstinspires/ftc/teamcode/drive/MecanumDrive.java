@@ -63,13 +63,14 @@ public class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
+        // FIXME maybe lateralInPerTick should be 1, maybe trackwidth is diagronal
         public double inPerTick = 1; // SparkFun OTOS Note: you can probably leave this at 1
-        public double lateralInPerTick = inPerTick * 0.9915539442744816;
-        public double trackWidthTicks = 12.5;
+        public double lateralInPerTick = inPerTick;
+        public double trackWidthTicks = 18;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.45;
-        public double kV = 0.11312875109399995;
+        public double kS = 1.30;
+        public double kV = 0.12;
         public double kA = 0.028;
 
         // path profile parameters (in inches)
