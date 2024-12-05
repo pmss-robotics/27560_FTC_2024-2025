@@ -4,7 +4,6 @@ import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
-import java.lang.reflect.Method;
 import java.util.function.DoubleSupplier;
 
 /**
@@ -23,9 +22,13 @@ public class DriveCommand extends CommandBase {
         this.isFieldCentric = isFieldCentric;
         addRequirements(drive);
     }
+
+    @Override
+    public void initialize() {
+        drive.follower.startTeleopDrive();
+    }
     @Override
     public void execute() {
-        if(isFieldCentric) drive.fieldCentric(lx.getAsDouble(), ly.getAsDouble(), rx.getAsDouble());
-        else drive.robotCentric(lx.getAsDouble(), ly.getAsDouble(), rx.getAsDouble());
+        drive.follower.setTeleOpMovementVectors(ly.getAsDouble(), lx.getAsDouble(), rx.getAsDouble(), isFieldCentric);
     }
 }
