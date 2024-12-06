@@ -17,6 +17,11 @@ public class DriveSubsystem extends SubsystemBase {
         follower.setStartingPose(startPose);
     }
 
+    @Override
+    public void periodic() {
+        follower.update();
+    }
+
     public Pose getPose() {
         return follower.getPose();
     }

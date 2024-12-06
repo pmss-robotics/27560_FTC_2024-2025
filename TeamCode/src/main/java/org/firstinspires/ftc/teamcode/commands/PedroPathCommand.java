@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.commands;
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.Subsystem;
 
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
@@ -21,11 +22,16 @@ public class PedroPathCommand extends CommandBase {
         this.holdEnd = holdEnd;
         addRequirements(drive);
     }
+    public PedroPathCommand(DriveSubsystem drive, Path path) {
+        this(drive, new PathChain(path), false);
+    }
+    public PedroPathCommand(DriveSubsystem drive, PathChain path) {
+        this(drive, path, false);
+    }
 
     @Override
-    public void execute() {
-        drive.follower.update();
-        drive.follower.followPath(path, holdEnd); // FIXME this might be unnecessary
+    public void initialize(){
+        drive.follower.followPath(path, holdEnd);
     }
 
     @Override
@@ -33,9 +39,5 @@ public class PedroPathCommand extends CommandBase {
         return !drive.follower.isBusy();
     }
 
-    @Override
-    public Set<Subsystem> getRequirements() {
-        return Collections.emptySet();
-    }
 }
 
