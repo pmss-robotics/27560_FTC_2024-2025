@@ -65,7 +65,6 @@ public class PinpointLocalizer extends Localizer {
      */
     public PinpointLocalizer(HardwareMap map, Pose setStartPose){
         hardwareMap = map;
-        // TODO: replace this with your Pinpoint port
         odo = hardwareMap.get(GoBildaPinpointDriver.class,"pinpoint");
 
         //This uses mm, to use inches divide these numbers by 25.4
@@ -73,7 +72,6 @@ public class PinpointLocalizer extends Localizer {
         //  odo.setYawScalar(1.0);
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         //odo.setEncoderResolution(13.26291192);
-        //TODO: Set encoder directions
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
 
         odo.resetPosAndIMU();

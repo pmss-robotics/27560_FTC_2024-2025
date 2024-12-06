@@ -3,34 +3,13 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.ConditionalCommand;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
-import com.arcrobotics.ftclib.command.SelectCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.commands.AutoAlignRoutine;
-import org.firstinspires.ftc.teamcode.commands.BucketRoutine;
-import org.firstinspires.ftc.teamcode.commands.DriveCommand;
-import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
-import org.firstinspires.ftc.teamcode.commands.SpecimenRoutine;
-import org.firstinspires.ftc.teamcode.drive.Drawing;
-import org.firstinspires.ftc.teamcode.drive.PinpointDrive;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
-import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-import org.firstinspires.ftc.teamcode.util.States;
 
 
 //hello
