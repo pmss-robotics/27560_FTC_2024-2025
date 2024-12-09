@@ -31,11 +31,11 @@ public class ClawSubsystem extends SubsystemBase {
     public static double F_target = 0, H_target = 0, W_target = 0; // in degrees
 
     private States.Claw currentClawState;
-    public static double wpHome = 0, wpBucket = 0, wpSpecimen = 0, wpIntake = 0, wpStart = 100; // in degrees
-    public static double hpHome = 0, hpBucket = 0, hpSpecimen = 0, hpIntake = 0, hpStart = 165; // in degrees
+    public static double wpHome = 95, wpBucket = 0, wpSpecimen = 0, wpIntake = 160, wpStart =  65 ; // in degrees
+    public static double hpHome = 165, hpBucket = 0, hpSpecimen = 0, hpIntake = 165, hpStart = 165; // in degrees
 
     private States.Finger currentFingerState;
-    public static double pClosed = 65, pOpen = 155; // in degrees
+    public static double pClosed = 63, pOpen = 155; // in degrees
 
     public ClawSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         // initialize hardware here alongside other parameters
@@ -87,7 +87,7 @@ public class ClawSubsystem extends SubsystemBase {
                 currentFingerState = States.Finger.opened;
                 break;
         }
-        finger.setPosition(F_target);
+        fingerSetPosition(F_target);
     }
 
     public void setFingerState(States.Finger state) {
@@ -100,7 +100,7 @@ public class ClawSubsystem extends SubsystemBase {
                 F_target = pClosed;
                 break;
         }
-        finger.setPosition(F_target);
+        fingerSetPosition(F_target);
     }
 
     public void setClawState(States.Claw state) {
@@ -124,8 +124,8 @@ public class ClawSubsystem extends SubsystemBase {
                 break;
             case start:
         }
-        hand.setPosition(H_target);
-        wrist.setPosition(W_target);
+        handSetPosition(H_target);
+        wristSetPosition(W_target);
     }
 
     @Override
@@ -138,6 +138,16 @@ public class ClawSubsystem extends SubsystemBase {
     private double scale(double angle){
         // angle in degrees
         return Range.scale(angle, 0, 300, 0, 1);
+    }
+
+    public void wristSetPosition(double target) {
+        wrist.setPosition(scale(target));
+    }
+    public void handSetPosition(double target) {
+        hand.setPosition(scale(target));
+    }
+    public void fingerSetPosition(double target) {
+        finger.setPosition(scale(target));
     }
 
 }

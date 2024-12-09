@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -43,8 +44,8 @@ public class TeleOp extends CommandOpMode {
     ArmPivotSubsystem armPivot;
     ClawSubsystem claw;
     VisionSubsystem vision;
-    public static double tempRot1 = 0;
-    public static double tempRot2 = 150;
+    public static double tempRot1 = 75;
+    public static double tempRot2 = 165;
 
 
     @Override
@@ -92,24 +93,27 @@ public class TeleOp extends CommandOpMode {
         // far intake
         new GamepadButton(tools, GamepadKeys.Button.B).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
                         new InstantCommand(() -> claw.setFingerState(States.Finger.opened), claw),
                         new PIDMoveCommand(armPivot, States.ArmPivot.intake),
                         new PIDMoveCommand(armExt, States.ArmExtension.intake),
-                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
                         swapState(States.Global.intake_far)
                 ),
-                returnHome(),
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
+                        returnHome()
+                ),
                 () -> currentState != States.Global.intake_far
         ));
         // near intake
         new GamepadButton(tools, GamepadKeys.Button.A).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
                         new InstantCommand(() -> claw.setFingerState(States.Finger.opened), claw),
                         new PIDMoveCommand(armPivot, States.ArmPivot.intake),
                         new PIDMoveCommand(armExt, States.ArmExtension.home),
-                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
                         swapState(States.Global.intake_near)
                 ),
                 returnHome(),
@@ -152,23 +156,28 @@ public class TeleOp extends CommandOpMode {
 
         //auto align function
         /*
-        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER)
+        new GamepadButton(tools, GamepadKeys.Button.LEFT_BUMPER)
                 .and(new Trigger(() -> currentState == States.Global.intake_far || currentState == States.Global.intake_near))
                 .whenActive(new AutoAlignRoutine(vision, claw, drive, armExt));
 
          */
-        new GamepadButton(tools, GamepadKeys.Button.RIGHT_BUMPER)
+        new GamepadButton(tools, GamepadKeys.Button.LEFT_BUMPER)
                 .toggleWhenPressed(
                         new InstantCommand(() -> ClawSubsystem.H_target = tempRot1),
                         new InstantCommand(() -> ClawSubsystem.H_target = tempRot2)
                 );
 
-        new GamepadButton(driver, GamepadKeys.Button.A)
-                .whenPressed(new InstantCommand(armPivot::resetEncoder, armPivot));
+        new GamepadButton(driver, GamepadKeys.Button.A).whenPressed(new SequentialCommandGroup(
+                new InstantCommand(() -> armPivot.setState(States.ArmPivot.home)),
+                new InstantCommand(()-> armPivot.leftPivot.setPower(0)),
+                new InstantCommand(()-> armPivot.rightPivot.setPower(0)),
+                new InstantCommand(armPivot::resetEncoder, armPivot)));
 
-        new GamepadButton(driver, GamepadKeys.Button.B)
-                .whenPressed(new InstantCommand(armExt::resetEncoder, armPivot));
 
+        new GamepadButton(driver, GamepadKeys.Button.B).whenPressed(new SequentialCommandGroup(
+                new InstantCommand(() -> ArmExtensionSubsystem.target = 0),
+                new InstantCommand(()-> armExt.leftExtension.setPower(0)),
+                new InstantCommand(armExt::resetEncoder, armExt)));
 
 
 
@@ -210,9 +219,11 @@ public class TeleOp extends CommandOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
 
+        // retract to a position
+
         while (!isStarted()) {
-            armPivot.holdPosition();
             armExt.holdPosition();
+            armPivot.holdPosition();
         }
         waitForStart();
 
@@ -230,7 +241,10 @@ public class TeleOp extends CommandOpMode {
         switch (currentState) {
             case intake_far:
             case intake_near:
-                return new InstantCommand(claw::toggleFingerState, claw);
+                return new SequentialCommandGroup(
+                        new PIDMoveCommand(armPivot, States.ArmPivot.home),
+                        new InstantCommand(claw::toggleFingerState)
+                );
             case bucket:
                 return new BucketRoutine(claw);
             case specimen:
@@ -241,10 +255,10 @@ public class TeleOp extends CommandOpMode {
     }
     public SequentialCommandGroup returnHome() {
         return new SequentialCommandGroup(
-                new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
                 new InstantCommand(() -> claw.setFingerState(States.Finger.closed), claw),
                 new PIDMoveCommand(armExt, States.ArmExtension.home),
-                new PIDMoveCommand(armPivot, States.ArmPivot.intake),
+                new PIDMoveCommand(armPivot, States.ArmPivot.home),
+                new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
                 swapState(States.Global.home)
         );
     }

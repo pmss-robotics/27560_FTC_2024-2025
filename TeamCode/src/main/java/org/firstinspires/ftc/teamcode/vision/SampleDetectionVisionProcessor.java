@@ -63,12 +63,12 @@ public class SampleDetectionVisionProcessor implements VisionProcessor
 
     static final int CONTOUR_LINE_THICKNESS = 2;
 
-    static class AnalyzedStone
+    public static class AnalyzedStone
     {
-        double angle;
-        String color;
-        Mat rvec;
-        Mat tvec;
+        public double angle;
+        public String color;
+        public Mat rvec;
+        public Mat tvec;
     }
 
     ArrayList<AnalyzedStone> internalStoneList = new ArrayList<>();
