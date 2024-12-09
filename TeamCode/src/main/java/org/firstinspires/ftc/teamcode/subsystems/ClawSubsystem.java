@@ -35,7 +35,7 @@ public class ClawSubsystem extends SubsystemBase {
     public static double hpHome = 165, hpBucket = 0, hpSpecimen = 0, hpIntake = 165, hpStart = 165; // in degrees
 
     private States.Finger currentFingerState;
-    public static double pClosed = 63, pOpen = 155; // in degrees
+    public static double pClosed = 65, pOpen = 155; // in degrees
 
     public ClawSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         // initialize hardware here alongside other parameters
