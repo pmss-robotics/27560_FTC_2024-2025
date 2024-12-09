@@ -32,10 +32,10 @@ public class ClawSubsystem extends SubsystemBase {
 
     private States.Claw currentClawState;
     public static double wpHome = 0, wpBucket = 0, wpSpecimen = 0, wpIntake = 0, wpStart = 100; // in degrees
-    public static double hpHome = 0, hpBucket = 0, hpSpecimen = 0, hpIntake = 0, hpStart = 150; // in degrees
+    public static double hpHome = 0, hpBucket = 0, hpSpecimen = 0, hpIntake = 0, hpStart = 165; // in degrees
 
     private States.Finger currentFingerState;
-    public static double pClosed = 138, pOpen = 185; // in degrees
+    public static double pClosed = 65, pOpen = 155; // in degrees
 
     public ClawSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         // initialize hardware here alongside other parameters

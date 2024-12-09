@@ -17,12 +17,14 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     Telemetry telemetry;
     public DcMotorEx leftExtension, rightExtension;
 
-    public static double P = 0, I = 0, D = 0;
+    public static double P = -0.04, I = 0, D = 0;
     public static double kSpring = 0.01;
-    public static int pHome = 0, pIntake = 0, pSpecimen = 0, pBucket = 0, pStart = 0;
+    //max 3820
+    public static int pHome = 5, pIntake = 3500, pSpecimen = 0, pBucket = 0, pStart = 0;
     public static int pSpecimen_offset = 0;
 
     public static int target = 0;
+    public static double tolerance = 20;
 
     public PIDController pidController;
     private VoltageSensor voltageSensor;
@@ -102,6 +104,7 @@ public class ArmExtensionSubsystem extends SubsystemBase {
 
     private double calculate() {
         pidController.setPID(P,I,D);
+        pidController.setTolerance(tolerance);
         int current = leftExtension.getCurrentPosition();
 
         double power = kSpring - pidController.calculate(current, target);

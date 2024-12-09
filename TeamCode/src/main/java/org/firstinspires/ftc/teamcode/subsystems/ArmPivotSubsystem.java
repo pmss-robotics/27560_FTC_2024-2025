@@ -23,17 +23,18 @@ import java.util.function.IntSupplier;
 public class ArmPivotSubsystem extends SubsystemBase {
     Telemetry telemetry;
     // left pivot is the lead motor
-    DcMotorEx leftPivot, rightPivot;
+    public DcMotorEx leftPivot, rightPivot;
     IntSupplier extensionAmount;
 
-    public static double P = 0.025, I = 0, D = 0.005;
-    public static double kCos = 0.02, kExt = 0;
-    public static int ticksPerRev = 1816;
-    public static int ticksFromPerp = 30;
-    public static int pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 200;
+    public static double P = 0.016, I = 0.00001, D = 0.0035;
+    public static double kCos = 0.03, kExt = 0.000008, kHelp = 0;
+    public static int ticksPerRev = 1772;
+    public static int pHome = 0, pBucket = 0, pSpecimen = 0, pIntake = 0, pStart = 200;
+    public static double tolerance = 10;
+
 
     public static int target = 0;
-    public static int max = 503;
+    public static int max = 480;
     private States.ArmPivot currentState;
 
     public PIDController pidController;
@@ -49,11 +50,12 @@ public class ArmPivotSubsystem extends SubsystemBase {
         rightPivot = hardwareMap.get(DcMotorEx.class, "rightPivot");
         rightPivot.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        leftPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        rightPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        rightPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         resetEncoder();
 
         pidController = new PIDController(P, I, D);
+        pidController.setTolerance(tolerance);
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
         target = pStart;
     }
@@ -105,17 +107,21 @@ public class ArmPivotSubsystem extends SubsystemBase {
             case start:
                 moveTo(pStart);
                 break;
+            case home:
+                moveTo(pHome);
+                break;
         }
     }
 
     private double calculate() {
         pidController.setPID(P,I,D);
+        pidController.setTolerance(tolerance);
         int current = leftPivot.getCurrentPosition();
 
         double power = pidController.calculate(current, target);
-        double angle = (2 * Math.PI * (current-ticksFromPerp)) / ticksPerRev;
+        double angle = (2 * Math.PI * current) / ticksPerRev;
 
-        power += kCos * Math.cos(angle) + kExt * extensionAmount.getAsInt();
+        power += kCos * Math.cos(angle) + kExt * extensionAmount.getAsInt() + kHelp;
         power /= voltageSensor.getVoltage();
 
         telemetry.addData("Pivot Power:", "%.6f", power);
