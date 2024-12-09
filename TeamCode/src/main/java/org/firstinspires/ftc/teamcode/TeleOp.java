@@ -22,6 +22,7 @@ import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
 import org.firstinspires.ftc.teamcode.commands.SpecimenRoutine;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Drawing;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
@@ -196,6 +197,10 @@ public class TeleOp extends CommandOpMode {
             telemetry.addData("heading (deg)", Math.toDegrees(pose.getHeading()));
             telemetry.addData("Current State:", currentState.name());
             telemetry.update();
+
+            Drawing.drawPoseHistory(drive.follower.getDashboardPoseTracker(), "#4CAF50");
+            Drawing.drawRobot(drive.getPose(), "#4CAF50");
+            Drawing.sendPacket();
 
         }));
         schedule(driveCommand);
