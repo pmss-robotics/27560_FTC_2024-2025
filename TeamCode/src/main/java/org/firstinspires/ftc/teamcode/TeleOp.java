@@ -3,8 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
@@ -19,13 +17,13 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.commands.AutoAlignRoutine;
 import org.firstinspires.ftc.teamcode.commands.BucketRoutine;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
 import org.firstinspires.ftc.teamcode.commands.SpecimenRoutine;
-import org.firstinspires.ftc.teamcode.drive.Drawing;
-import org.firstinspires.ftc.teamcode.drive.PinpointDrive;
+import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Drawing;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
@@ -61,7 +59,7 @@ public class TeleOp extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         tools = new GamepadEx(gamepad2);
         // The driveSubsystem wraps Roadrunner's MecanumDrive to combine with Commands.
-        drive = new DriveSubsystem(new PinpointDrive(hardwareMap, new Pose2d(0, 0, 0)), telemetry);
+        drive = new DriveSubsystem(new Follower(hardwareMap), new Pose(0,0,0), telemetry);
         // The driveCommand uses methods defined in the DriveSubsystem to create behaviour.
         // we're passing in methods to get values instead of straight values because it avoids
         // disturbing the structure of the CommandOpMode. The aim is to define bindings in this
@@ -184,6 +182,7 @@ public class TeleOp extends CommandOpMode {
 
 
 
+
         /*
         control objectives:
         toggle - close intake <-> home
@@ -201,17 +200,17 @@ public class TeleOp extends CommandOpMode {
 
 
         schedule(new RunCommand(() -> {
-            TelemetryPacket packet = new TelemetryPacket();
-            Pose2d pose = drive.getPose();
-            telemetry.addData("x", pose.position.x);
-            telemetry.addData("y",pose.position.y);
-            telemetry.addData("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
+            Pose pose = drive.getPose();
+            telemetry.addData("x", pose.getX());
+            telemetry.addData("y",pose.getY());
+            telemetry.addData("heading (deg)", Math.toDegrees(pose.getHeading()));
             telemetry.addData("Current State:", currentState.name());
             telemetry.update();
 
-            packet.fieldOverlay().setStroke("#3F51B5");
-            Drawing.drawRobot(packet.fieldOverlay(), pose);
-            FtcDashboard.getInstance().sendTelemetryPacket(packet);
+            Drawing.drawPoseHistory(drive.follower.getDashboardPoseTracker(), "#4CAF50");
+            Drawing.drawRobot(drive.getPose(), "#4CAF50");
+            Drawing.sendPacket();
+
         }));
         schedule(driveCommand);
     }

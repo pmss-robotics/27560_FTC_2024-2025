@@ -50,8 +50,8 @@ public class ArmPivotSubsystem extends SubsystemBase {
         rightPivot = hardwareMap.get(DcMotorEx.class, "rightPivot");
         rightPivot.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        leftPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        rightPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+        rightPivot.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
         resetEncoder();
 
         pidController = new PIDController(P, I, D);
