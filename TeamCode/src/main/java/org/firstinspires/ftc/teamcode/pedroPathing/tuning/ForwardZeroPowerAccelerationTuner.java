@@ -41,7 +41,7 @@ import java.util.List;
  */
 @Config
 @Autonomous(name = "Forward Zero Power Acceleration Tuner", group = "Autonomous Pathing Tuning")
-public class    ForwardZeroPowerAccelerationTuner extends OpMode {
+public class ForwardZeroPowerAccelerationTuner extends OpMode {
     private ArrayList<Double> accelerations = new ArrayList<>();
 
     private DcMotorEx leftFront;
