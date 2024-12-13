@@ -35,6 +35,7 @@ public class ArmPivotSubsystem extends SubsystemBase {
 
     public static int target = 0;
     public static int max = 480;
+    public static double manualPower = 0.2;
     private States.ArmPivot currentState;
 
     public PIDController pidController;
@@ -75,17 +76,20 @@ public class ArmPivotSubsystem extends SubsystemBase {
         leftPivot.setPower(power);
         rightPivot.setPower(power);
     }
-    public void manual(double power) {
-        target = leftPivot.getCurrentPosition();
-        if(target > max) {
-            target = max-10;
-        } else if (target <= 0) {
-            target = 10;
+    public void manual(boolean forward) {
+        double power;
+        if(forward) {
+            power = manualPower;
         }else {
-            double p = calculate();
-            leftPivot.setPower(p + power);
-            rightPivot.setPower(p + power);
+            power = manualPower * -1;
         }
+        leftPivot.setPower(power);
+        rightPivot.setPower(power);
+        //rightExtension.setPower(p);
+    }
+
+    public void resetTarget() {
+        target = leftPivot.getCurrentPosition();
     }
 
     public States.ArmPivot getCurrentState() {

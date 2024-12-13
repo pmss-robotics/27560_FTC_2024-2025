@@ -46,6 +46,8 @@ public class TeleOp extends CommandOpMode {
     VisionSubsystem vision;
     public static double tempRot1 = 75;
     public static double tempRot2 = 165;
+    public static double pivotThreshold = 0.5;
+
 
 
     @Override
@@ -149,10 +151,51 @@ public class TeleOp extends CommandOpMode {
             this::bumper
         ));
 
-        new Trigger(() -> tools.getLeftY()!= 0)
-                .whileActiveContinuous(new InstantCommand(() -> armPivot.manual(tools.getLeftY()), armPivot));
+        new GamepadButton(tools, GamepadKeys.Button.DPAD_UP)
+                .whenHeld(new InstantCommand(() -> armExt.manual(true) ,armExt))
+                .whenReleased(
+                   new InstantCommand(() -> {
+                       armExt.leftExtension.setPower(0);
+                       armExt.resetTarget();
+                   }, armExt)
+                );
+
+        new GamepadButton(tools, GamepadKeys.Button.DPAD_DOWN)
+                .whenHeld(new InstantCommand(() -> armExt.manual(false) ,armExt))
+                .whenReleased(
+                        new InstantCommand(() -> {
+                            armExt.leftExtension.setPower(0);
+                            armExt.resetTarget();
+                        }, armExt)
+                );
+
+
+        new Trigger(() -> tools.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > pivotThreshold)
+                .whileActiveContinuous(new InstantCommand(() -> armPivot.manual(false), armPivot))
+                .whenInactive(
+                        new InstantCommand(() -> {
+                            armPivot.leftPivot.setPower(0);
+                            armPivot.rightPivot.setPower(0);
+                            armPivot.resetTarget();
+                        }, armPivot)
+                );
+
+        new Trigger(() -> tools.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > pivotThreshold)
+                .whileActiveContinuous(new InstantCommand(() -> armPivot.manual(true), armPivot))
+                .whenInactive(
+                        new InstantCommand(() -> {
+                            armPivot.leftPivot.setPower(0);
+                            armPivot.rightPivot.setPower(0);
+                            armPivot.resetTarget();
+                        }, armPivot)
+                );
+
+
+        /*
         new Trigger(() -> tools.getRightY()!= 0)
                 .whileActiveContinuous(new InstantCommand(() -> armExt.manual(tools.getRightY()), armExt));
+
+         */
 
         //auto align function
         /*

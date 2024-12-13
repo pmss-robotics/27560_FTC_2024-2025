@@ -26,6 +26,8 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     public static int target = 0;
     public static double tolerance = 20;
 
+    public static double manualPower = 1;
+
     public PIDController pidController;
     private VoltageSensor voltageSensor;
     private States.ArmExtension currentState;
@@ -68,10 +70,18 @@ public class ArmExtensionSubsystem extends SubsystemBase {
         leftExtension.setPower(power);
         //rightExtension.setPower(power);
     }
-    public void manual(double power) {
-        double p = calculate() + power;
-        leftExtension.setPower(p);
+    public void manual(boolean forward) {
+        double power;
+        if(forward) {
+            power = manualPower;
+        }else {
+            power = manualPower * -1;
+        }
+        leftExtension.setPower(power);
         //rightExtension.setPower(p);
+    }
+
+    public void resetTarget() {
         target = leftExtension.getCurrentPosition();
     }
 
