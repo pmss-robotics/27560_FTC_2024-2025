@@ -10,7 +10,6 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -23,7 +22,6 @@ import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
 import org.firstinspires.ftc.teamcode.commands.SpecimenRoutine;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
-import org.firstinspires.ftc.teamcode.pedroPathing.util.Drawing;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
@@ -223,37 +221,9 @@ public class TeleOp extends CommandOpMode {
                 new InstantCommand(armExt::resetEncoder, armExt)));
 
 
-
-
-
-        /*
-        control objectives:
-        toggle - close intake <-> home
-        toggle - far intake <-> home
-        toggle - high? bucket <-> home
-        toggle - low bucket <-> home
-        toggle - auto align then pick up <-> claw disengaged
-
-        toggle - specimen <-> home
-        button - place specimen & reset (extend down, release claw, extend up)
-
-        + each position should be reached by at most 1 motion.
-        + i.e. we can go from close intake to low bucket without going thru home.
-         */
-
-
         schedule(new RunCommand(() -> {
-            Pose pose = drive.getPose();
-            telemetry.addData("x", pose.getX());
-            telemetry.addData("y",pose.getY());
-            telemetry.addData("heading (deg)", Math.toDegrees(pose.getHeading()));
             telemetry.addData("Current State:", currentState.name());
             telemetry.update();
-
-            Drawing.drawPoseHistory(drive.follower.getDashboardPoseTracker(), "#4CAF50");
-            Drawing.drawRobot(drive.getPose(), "#4CAF50");
-            Drawing.sendPacket();
-
         }));
         schedule(driveCommand);
     }
@@ -263,7 +233,6 @@ public class TeleOp extends CommandOpMode {
         initialize();
 
         // retract to a position
-
         while (!isStarted()) {
             armExt.holdPosition();
             armPivot.holdPosition();
