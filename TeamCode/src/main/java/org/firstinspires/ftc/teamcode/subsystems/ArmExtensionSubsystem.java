@@ -20,7 +20,7 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     public static double P = -0.04, I = 0, D = 0;
     public static double kSpring = 0.01;
     //max 3820
-    public static int pHome = 5, pIntake = 3500, pSpecimen = 0, pBucket = 0, pStart = 0;
+    public static int pHome = 5, pIntake = 3500, pSpecimen = 0, pBucket = 3500, pStart = 0;
     public static int pSpecimen_offset = 0;
 
     public static int target = 0;
