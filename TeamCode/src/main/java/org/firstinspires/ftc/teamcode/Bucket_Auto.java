@@ -11,17 +11,18 @@ import org.firstinspires.ftc.teamcode.commands.PedroPathCommand;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathBuilder;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.pedroPathing.util.Drawing;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
+
+
 
 
 @Config
 @Autonomous(name="Bucket Auto", group="Auto")
 public class Bucket_Auto extends CommandOpMode {
-    Pose start = new Pose(7.9045, 100, 0);
+    Pose start = new Pose(9.124016, 104.874016, Math.toRadians(90));
     Pose bucket = new Pose(24, 120, Math.toRadians(135));
     Pose sample1 = new Pose(24, 120, Math.toRadians(0));
     Pose sample2 = new Pose(24, 120, Math.toRadians(30));
@@ -38,7 +39,11 @@ public class Bucket_Auto extends CommandOpMode {
             telemetry.update();
         }));
         schedule(new PedroPathCommand(drive, toBucket(start)));
+        
     }
+
+
+
 
     public PathChain toBucket(Pose start){
         return drive.follower.pathBuilder()

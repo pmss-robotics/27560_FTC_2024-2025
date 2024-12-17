@@ -26,6 +26,7 @@ import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,6 +43,7 @@ public class VisionSubsystem extends SubsystemBase {
 
     /**
      * All vision related logic will be done here including april tags, tensorflow, and opencv
+     *
      * @param hardwareMap
      */
     public VisionSubsystem(HardwareMap hardwareMap, Telemetry telemetry) throws InterruptedException {
@@ -102,9 +104,13 @@ public class VisionSubsystem extends SubsystemBase {
     public double getSampleAngle() {
         double angle = 0;
         enhancedSampleProcessor.DetectedSample closest = null;
-        for ( enhancedSampleProcessor.DetectedSample sample : sampleDetection.getDetectedSamples()) {
+        List<enhancedSampleProcessor.DetectedSample> detections = sampleDetection.getDetectedSamples();
+        for ( enhancedSampleProcessor.DetectedSample sample : detections) {
             // find the sample closest to the claw
             // sample.tvec.
+            telemetry.addData("Sample: " + detections.indexOf(sample), " "+ sample.color.toString());
+            telemetry.addData("Sample: " + detections.indexOf(sample), " " + sample.angle);
+            telemetry.addData("Sample: " + detections.indexOf(sample), " " + sample.tvec.toString());
         }
         if(Objects.isNull(closest)) return 666;
         return angle;

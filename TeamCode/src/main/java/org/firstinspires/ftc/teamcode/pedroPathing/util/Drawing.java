@@ -12,6 +12,8 @@ import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
 
+import java.util.Arrays;
+
 /**
  * This is the Drawing class. It handles the drawing of stuff on FTC Dashboard, like the robot.
  *
@@ -94,7 +96,7 @@ public class Drawing {
         if (packet == null) packet = new TelemetryPacket();
 
         packet.fieldOverlay().setStroke(color);
-        packet.fieldOverlay().strokePolyline(poseTracker.getXPositionsArray(), poseTracker.getYPositionsArray());
+        packet.fieldOverlay().strokePolyline(Arrays.stream(poseTracker.getYPositionsArray()).map((x)-> x-72).toArray(), Arrays.stream(poseTracker.getXPositionsArray()).map((x)-> -x+72).toArray());
     }
 
     /**
@@ -135,6 +137,7 @@ public class Drawing {
      * @param t the Pose to draw at
      */
     public static void drawRobotOnCanvas(Canvas c, Pose t) {
+        t = new Pose(t.getY()-72, -t.getX()+72, t.getHeading() - Math.toRadians(90));
         c.strokeCircle(t.getX(), t.getY(), ROBOT_RADIUS);
         Vector v = t.getHeadingVector();
         v.setMagnitude(v.getMagnitude() * ROBOT_RADIUS);

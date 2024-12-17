@@ -47,7 +47,6 @@ public class TeleOp extends CommandOpMode {
     public static double pivotThreshold = 0.5;
 
 
-
     @Override
     public void initialize() {
         // data sent to telemetry shows up on dashboard and driverGamepad station
@@ -231,14 +230,12 @@ public class TeleOp extends CommandOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         initialize();
-
         // retract to a position
         while (!isStarted()) {
             armExt.holdPosition();
             armPivot.holdPosition();
         }
         waitForStart();
-
         // run the scheduler
         while (!isStopRequested() && opModeIsActive()) {
             run();
@@ -274,6 +271,4 @@ public class TeleOp extends CommandOpMode {
                 swapState(States.Global.home)
         );
     }
-
-
 }
