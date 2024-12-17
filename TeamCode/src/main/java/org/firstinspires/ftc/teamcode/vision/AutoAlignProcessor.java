@@ -18,11 +18,10 @@ import org.opencv.core.RotatedRect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
-import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
 
-public class SampleDetectionVisionProcessor implements VisionProcessor
+public class AutoAlignProcessor implements VisionProcessor
 {
     /*
      * Our working image buffers
@@ -63,6 +62,8 @@ public class SampleDetectionVisionProcessor implements VisionProcessor
 
     static final int CONTOUR_LINE_THICKNESS = 2;
 
+    static final double minArea = 1000;
+
     public static class AnalyzedStone
     {
         public double angle;
@@ -85,7 +86,7 @@ public class SampleDetectionVisionProcessor implements VisionProcessor
      */
 
 
-    public SampleDetectionVisionProcessor()
+    public AutoAlignProcessor()
     {
         // Initialize camera parameters
         // Replace these values with your actual camera calibration parameters
@@ -176,16 +177,19 @@ public class SampleDetectionVisionProcessor implements VisionProcessor
         // Now analyze the contours
         for(MatOfPoint contour : blueContoursList)
         {
+            if(Imgproc.contourArea(contour) < minArea) continue;
             analyzeContour(contour, input, "Blue");
         }
 
         for(MatOfPoint contour : redContoursList)
         {
+            if(Imgproc.contourArea(contour) < minArea) continue;
             analyzeContour(contour, input, "Red");
         }
 
         for(MatOfPoint contour : yellowContoursList)
         {
+            if(Imgproc.contourArea(contour) < minArea) continue;
             analyzeContour(contour, input, "Yellow");
         }
     }

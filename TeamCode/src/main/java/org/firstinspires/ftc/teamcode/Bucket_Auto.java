@@ -13,7 +13,6 @@ import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
-import org.firstinspires.ftc.teamcode.pedroPathing.util.Drawing;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
 
@@ -34,12 +33,10 @@ public class Bucket_Auto extends CommandOpMode {
     public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new DriveSubsystem(new Follower(hardwareMap), start, telemetry);
-
         schedule(new RunCommand(() -> {
             telemetry.update();
         }));
         schedule(new PedroPathCommand(drive, toBucket(start)));
-        
     }
 
 

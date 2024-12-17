@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.util.Methods.*;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
@@ -121,11 +123,7 @@ public class TeleOp extends CommandOpMode {
         // bucket
         new GamepadButton(tools, GamepadKeys.Button.X).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
-                        new InstantCommand(() -> claw.setFingerState(States.Finger.closed), claw),
-                        new PIDMoveCommand(armPivot, States.ArmPivot.bucket),
-                        new PIDMoveCommand(armExt, States.ArmExtension.bucket),
-                        new InstantCommand(() -> claw.setClawState(States.Claw.bucket), claw),
+                        lowBucket(armExt, armPivot, claw),
                         swapState(States.Global.bucket)
                 ),
                 returnHome(),
@@ -134,10 +132,7 @@ public class TeleOp extends CommandOpMode {
         // specimen
         new GamepadButton(tools, GamepadKeys.Button.Y).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
-                        new InstantCommand(() -> claw.setFingerState(States.Finger.closed), claw),
-                        new PIDMoveCommand(armPivot, States.ArmPivot.specimen),
-                        new PIDMoveCommand(armExt, States.ArmExtension.specimen_1),
+                        specimen(armExt, armPivot, claw),
                         swapState(States.Global.specimen)
                 ),
                 returnHome(),

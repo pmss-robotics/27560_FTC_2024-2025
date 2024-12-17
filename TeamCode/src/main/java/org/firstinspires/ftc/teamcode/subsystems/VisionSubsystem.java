@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
+import static org.firstinspires.ftc.teamcode.vision.AutoAlignProcessor.AnalyzedStone;
 import static java.lang.Thread.sleep;
 
 import android.graphics.Bitmap;
@@ -20,7 +21,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.Exposur
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.stream.CameraStreamSource;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
-import org.firstinspires.ftc.teamcode.vision.enhancedSampleProcessor;
+import org.firstinspires.ftc.teamcode.vision.AutoAlignProcessor;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.android.Utils;
@@ -31,13 +32,15 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+
+
 @Config
 public class VisionSubsystem extends SubsystemBase {
 
     public static int EXPOSURE_MS = 6;
     public static int GAIN = 190;
     //private final AprilTagProcessor aprilTag;
-    private final enhancedSampleProcessor sampleDetection;
+    private final AutoAlignProcessor sampleDetection;
     private final VisionPortal visionPortal;
     private Telemetry telemetry;
 
@@ -50,7 +53,7 @@ public class VisionSubsystem extends SubsystemBase {
         this.telemetry = telemetry;
         // TODO sample code!!!! re-implement in the field.
         final CameraStreamProcessor dashboard = new CameraStreamProcessor();
-        sampleDetection = new enhancedSampleProcessor();
+        sampleDetection = new AutoAlignProcessor();
         /*
         aprilTag = new AprilTagProcessor.Builder()
                 .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
@@ -103,25 +106,17 @@ public class VisionSubsystem extends SubsystemBase {
 
     public double getSampleAngle() {
         double angle = 0;
-        enhancedSampleProcessor.DetectedSample closest = null;
-        List<enhancedSampleProcessor.DetectedSample> detections = sampleDetection.getDetectedSamples();
-        for ( enhancedSampleProcessor.DetectedSample sample : detections) {
+        AnalyzedStone closest = null;
+        List<AnalyzedStone> detections = sampleDetection.getDetectedStones();
+        for ( AnalyzedStone sample : detections) {
             // find the sample closest to the claw
-            // sample.tvec.
-            telemetry.addData("Sample: " + detections.indexOf(sample), " "+ sample.color.toString());
+            telemetry.addData("Sample: " + detections.indexOf(sample), " "+ sample.color);
             telemetry.addData("Sample: " + detections.indexOf(sample), " " + sample.angle);
             telemetry.addData("Sample: " + detections.indexOf(sample), " " + sample.tvec.toString());
         }
         if(Objects.isNull(closest)) return 666;
         return angle;
     }
-
-
-
-
-
-
-
 
 
     public static class CameraStreamProcessor implements VisionProcessor, CameraStreamSource {
