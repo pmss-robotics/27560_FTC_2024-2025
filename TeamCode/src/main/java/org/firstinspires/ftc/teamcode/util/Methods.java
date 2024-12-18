@@ -38,4 +38,14 @@ public class Methods {
         );
     }
 
+    public static SequentialCommandGroup intake(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw, States.ArmExtension position) {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
+                new PIDMoveCommand(pivot, States.ArmPivot.intake),
+                new PIDMoveCommand(ext, position),
+                new InstantCommand(() -> claw.setClawState(States.Claw.home)),
+                new InstantCommand(() -> claw.setFingerState(States.Finger.opened))
+        );
+    }
+
 }

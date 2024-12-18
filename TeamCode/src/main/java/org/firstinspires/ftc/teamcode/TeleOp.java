@@ -14,7 +14,6 @@ import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
@@ -94,11 +93,7 @@ public class TeleOp extends CommandOpMode {
         // far intake
         new GamepadButton(tools, GamepadKeys.Button.B).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
-                        new PIDMoveCommand(armPivot, States.ArmPivot.intake),
-                        new PIDMoveCommand(armExt, States.ArmExtension.intake),
-                        new InstantCommand(() -> claw.setClawState(States.Claw.home)),
-                        new InstantCommand(() -> claw.setFingerState(States.Finger.opened)),
+                        intake(armExt, armPivot, claw, States.ArmExtension.intake),
                         swapState(States.Global.intake_far)
                 ),
                 new SequentialCommandGroup(
@@ -110,11 +105,7 @@ public class TeleOp extends CommandOpMode {
         // near intake
         new GamepadButton(tools, GamepadKeys.Button.A).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
-                        new PIDMoveCommand(armPivot, States.ArmPivot.intake),
-                        new PIDMoveCommand(armExt, States.ArmExtension.home),
-                        new InstantCommand(() -> claw.setClawState(States.Claw.home)),
-                        new InstantCommand(() -> claw.setFingerState(States.Finger.opened)),
+                        intake(armExt, armPivot, claw, States.ArmExtension.home),
                         swapState(States.Global.intake_near)
                 ),
                 returnHome(),
@@ -143,9 +134,9 @@ public class TeleOp extends CommandOpMode {
             this::bumper
         ));
 
-        /*
+
         new GamepadButton(tools, GamepadKeys.Button.DPAD_UP)
-                .whenHeld(new InstantCommand(() -> armExt.manual(true) ,armExt))
+                .whenPressed(new InstantCommand(() -> armExt.manual(true) ,armExt))
                 .whenReleased(
                    new InstantCommand(() -> {
                        armExt.leftExtension.setPower(0);
@@ -154,7 +145,7 @@ public class TeleOp extends CommandOpMode {
                 );
 
         new GamepadButton(tools, GamepadKeys.Button.DPAD_DOWN)
-                .whenHeld(new InstantCommand(() -> armExt.manual(false) ,armExt))
+                .whenPressed(new InstantCommand(() -> armExt.manual(false) ,armExt))
                 .whenReleased(
                         new InstantCommand(() -> {
                             armExt.leftExtension.setPower(0);
@@ -162,7 +153,7 @@ public class TeleOp extends CommandOpMode {
                         }, armExt)
                 );
 
-         */
+
 
         /*
 
@@ -208,17 +199,22 @@ public class TeleOp extends CommandOpMode {
                         new InstantCommand(() -> ClawSubsystem.H_target = tempRot2)
                 );
 
-        new GamepadButton(driver, GamepadKeys.Button.A).whenPressed(new ParallelCommandGroup(
-                new InstantCommand(() -> armPivot.setState(States.ArmPivot.home)),
-                new InstantCommand(()-> armPivot.leftPivot.setPower(0)),
-                new InstantCommand(()-> armPivot.rightPivot.setPower(0)),
-                new InstantCommand(armPivot::resetEncoder, armPivot)));
+        new GamepadButton(driver, GamepadKeys.Button.A).whileHeld(new ParallelCommandGroup(
+                new InstantCommand(() -> {
+                    ArmPivotSubsystem.target = 0;
+                    armPivot.leftPivot.setPower(0);
+                    armPivot.rightPivot.setPower(0);
+                    armPivot.resetEncoder();
+                }, armPivot)
+        ));
 
 
-        new GamepadButton(driver, GamepadKeys.Button.B).whenPressed(new ParallelCommandGroup(
-                new InstantCommand(() -> ArmExtensionSubsystem.target = 0),
-                new InstantCommand(()-> armExt.leftExtension.setPower(0)),
-                new InstantCommand(armExt::resetEncoder, armExt)));
+        new GamepadButton(driver, GamepadKeys.Button.B).whileHeld(new ParallelCommandGroup(
+                new InstantCommand(() -> {
+                    ArmExtensionSubsystem.target = 0;
+                    armExt.leftExtension.setPower(0);
+                    armExt.resetEncoder();
+                }, armExt)));
 
 
         schedule(new RunCommand(() -> {

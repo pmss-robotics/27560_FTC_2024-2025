@@ -4,19 +4,13 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.commands.PedroPathCommand;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
@@ -38,7 +32,7 @@ public class Bucket_Auto extends CommandOpMode {
     public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         drive = new DriveSubsystem(new Follower(hardwareMap), start, telemetry);
-        GamepadEx tools = new GamepadEx(gamepad2);
+
         schedule(new RunCommand(() -> {
             telemetry.update();
         }));
