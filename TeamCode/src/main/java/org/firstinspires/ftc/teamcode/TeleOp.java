@@ -9,6 +9,7 @@ import com.arcrobotics.ftclib.command.Command;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -18,7 +19,6 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.commands.BucketRoutine;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
 import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
 import org.firstinspires.ftc.teamcode.commands.SpecimenRoutine;
@@ -94,15 +94,15 @@ public class TeleOp extends CommandOpMode {
         // far intake
         new GamepadButton(tools, GamepadKeys.Button.B).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
-                        new InstantCommand(() -> claw.setFingerState(States.Finger.opened), claw),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
                         new PIDMoveCommand(armPivot, States.ArmPivot.intake),
                         new PIDMoveCommand(armExt, States.ArmExtension.intake),
-                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.home)),
+                        new InstantCommand(() -> claw.setFingerState(States.Finger.opened)),
                         swapState(States.Global.intake_far)
                 ),
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
                         returnHome()
                 ),
                 () -> currentState != States.Global.intake_far
@@ -110,11 +110,11 @@ public class TeleOp extends CommandOpMode {
         // near intake
         new GamepadButton(tools, GamepadKeys.Button.A).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> claw.setClawState(States.Claw.intake), claw),
-                        new InstantCommand(() -> claw.setFingerState(States.Finger.opened), claw),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
                         new PIDMoveCommand(armPivot, States.ArmPivot.intake),
                         new PIDMoveCommand(armExt, States.ArmExtension.home),
-                        new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.home)),
+                        new InstantCommand(() -> claw.setFingerState(States.Finger.opened)),
                         swapState(States.Global.intake_near)
                 ),
                 returnHome(),
@@ -143,6 +143,7 @@ public class TeleOp extends CommandOpMode {
             this::bumper
         ));
 
+        /*
         new GamepadButton(tools, GamepadKeys.Button.DPAD_UP)
                 .whenHeld(new InstantCommand(() -> armExt.manual(true) ,armExt))
                 .whenReleased(
@@ -161,6 +162,9 @@ public class TeleOp extends CommandOpMode {
                         }, armExt)
                 );
 
+         */
+
+        /*
 
         new Trigger(() -> tools.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > pivotThreshold)
                 .whileActiveContinuous(new InstantCommand(() -> armPivot.manual(false), armPivot))
@@ -182,6 +186,8 @@ public class TeleOp extends CommandOpMode {
                         }, armPivot)
                 );
 
+         */
+
 
         /*
         new Trigger(() -> tools.getRightY()!= 0)
@@ -202,14 +208,14 @@ public class TeleOp extends CommandOpMode {
                         new InstantCommand(() -> ClawSubsystem.H_target = tempRot2)
                 );
 
-        new GamepadButton(driver, GamepadKeys.Button.A).whenPressed(new SequentialCommandGroup(
+        new GamepadButton(driver, GamepadKeys.Button.A).whenPressed(new ParallelCommandGroup(
                 new InstantCommand(() -> armPivot.setState(States.ArmPivot.home)),
                 new InstantCommand(()-> armPivot.leftPivot.setPower(0)),
                 new InstantCommand(()-> armPivot.rightPivot.setPower(0)),
                 new InstantCommand(armPivot::resetEncoder, armPivot)));
 
 
-        new GamepadButton(driver, GamepadKeys.Button.B).whenPressed(new SequentialCommandGroup(
+        new GamepadButton(driver, GamepadKeys.Button.B).whenPressed(new ParallelCommandGroup(
                 new InstantCommand(() -> ArmExtensionSubsystem.target = 0),
                 new InstantCommand(()-> armExt.leftExtension.setPower(0)),
                 new InstantCommand(armExt::resetEncoder, armExt)));
@@ -217,6 +223,7 @@ public class TeleOp extends CommandOpMode {
 
         schedule(new RunCommand(() -> {
             telemetry.addData("Current State:", currentState.name());
+            telemetry.addData("heading (deg) target: ", DriveCommand.target);
             telemetry.update();
         }));
         schedule(driveCommand);
@@ -246,11 +253,10 @@ public class TeleOp extends CommandOpMode {
             case intake_far:
             case intake_near:
                 return new SequentialCommandGroup(
-                        new PIDMoveCommand(armPivot, States.ArmPivot.home),
                         new InstantCommand(claw::toggleFingerState)
                 );
             case bucket:
-                return new BucketRoutine(claw);
+                return new InstantCommand(() -> claw.setFingerState(States.Finger.opened));
             case specimen:
                 return new SpecimenRoutine(claw, armExt);
             default:
@@ -259,10 +265,10 @@ public class TeleOp extends CommandOpMode {
     }
     public SequentialCommandGroup returnHome() {
         return new SequentialCommandGroup(
-                new InstantCommand(() -> claw.setFingerState(States.Finger.closed), claw),
+                new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
                 new PIDMoveCommand(armExt, States.ArmExtension.home),
                 new PIDMoveCommand(armPivot, States.ArmPivot.home),
-                new InstantCommand(() -> claw.setClawState(States.Claw.home), claw),
+                new InstantCommand(() -> claw.setClawState(States.Claw.home)),
                 swapState(States.Global.home)
         );
     }

@@ -21,20 +21,14 @@ public class PIDMoveCommand extends CommandBase {
     public PIDMoveCommand(ArmPivotSubsystem pivot, States.ArmPivot state) {
         this.pivot = pivot;
         pivotState = state;
-        addRequirements(pivot);
     }
     public PIDMoveCommand(ArmExtensionSubsystem extension, States.ArmExtension state){
         this.extension = extension;
         extensionState = state;
-        addRequirements(extension);
     }
     @Override
     public void initialize() {
         controlPivot = Objects.nonNull(pivot);
-    }
-
-    @Override
-    public void execute() {
         if(controlPivot) {
             pivot.setState(pivotState);
         } else {

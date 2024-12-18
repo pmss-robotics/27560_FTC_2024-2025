@@ -70,7 +70,7 @@ public class Follower {
 
     private DriveVectorScaler driveVectorScaler;
 
-    private PoseUpdater poseUpdater;
+    public PoseUpdater poseUpdater;
     private DashboardPoseTracker dashboardPoseTracker;
 
     private Pose closestPose;
@@ -180,7 +180,7 @@ public class Follower {
         }
 
         for (DcMotorEx motor : motors) {
-            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         }
 
         dashboardPoseTracker = new DashboardPoseTracker(poseUpdater);
