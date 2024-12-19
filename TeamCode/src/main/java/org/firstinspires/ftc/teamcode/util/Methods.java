@@ -5,11 +5,24 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
+import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
+import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
 public class Methods {
+    public static PathChain linePath(DriveSubsystem drive, Pose start, Pose end) {
+        return drive.follower.pathBuilder()
+                .addBezierLine(new Point(start), new Point(end))
+                .setLinearHeadingInterpolation(start.getHeading(), end.getHeading())
+                .build();
+    }
+
     public static SequentialCommandGroup lowBucket(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw) {
         return new SequentialCommandGroup(
                 new PIDMoveCommand(ext, States.ArmExtension.home),

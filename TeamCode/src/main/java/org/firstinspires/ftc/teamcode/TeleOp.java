@@ -14,6 +14,7 @@ import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
+import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 
@@ -46,8 +47,9 @@ public class TeleOp extends CommandOpMode {
     public static double tempRot1 = 75;
     public static double tempRot2 = 165;
     public static double pivotThreshold = 0.5;
+    public static double driveMult = 1;
 
-
+    Pose startPose = new Pose(72,72,0);
     @Override
     public void initialize() {
         // data sent to telemetry shows up on dashboard and driverGamepad station
@@ -59,7 +61,7 @@ public class TeleOp extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         tools = new GamepadEx(gamepad2);
         // The driveSubsystem wraps Roadrunner's MecanumDrive to combine with Commands.
-        drive = new DriveSubsystem(new Follower(hardwareMap), new Pose(72,72,0), telemetry);
+        drive = new DriveSubsystem(new Follower(hardwareMap), startPose, telemetry);
         // The driveCommand uses methods defined in the DriveSubsystem to create behaviour.
         // we're passing in methods to get values instead of straight values because it avoids
         // disturbing the structure of the CommandOpMode. The aim is to define bindings in this
@@ -67,9 +69,9 @@ public class TeleOp extends CommandOpMode {
         // run() loop.
 
         DriveCommand driveCommand = new DriveCommand(drive,
-                () -> -driver.getLeftX() * driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER),
-                () -> driver.getLeftY() * driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER),
-                () -> -driver.getRightX() * driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER),
+                () -> -driver.getLeftX() * driveMult,
+                () -> driver.getLeftY() * driveMult,
+                () -> -driver.getRightX() * driveMult,
                 true);
 
         armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
@@ -136,7 +138,7 @@ public class TeleOp extends CommandOpMode {
 
 
         new GamepadButton(tools, GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new InstantCommand(() -> armExt.manual(true) ,armExt))
+                .whileHeld(new InstantCommand(() -> armExt.manual(true), armExt))
                 .whenReleased(
                    new InstantCommand(() -> {
                        armExt.leftExtension.setPower(0);
@@ -145,7 +147,7 @@ public class TeleOp extends CommandOpMode {
                 );
 
         new GamepadButton(tools, GamepadKeys.Button.DPAD_DOWN)
-                .whenPressed(new InstantCommand(() -> armExt.manual(false) ,armExt))
+                .whileHeld(new InstantCommand(() -> armExt.manual(false) ,armExt))
                 .whenReleased(
                         new InstantCommand(() -> {
                             armExt.leftExtension.setPower(0);
@@ -216,6 +218,26 @@ public class TeleOp extends CommandOpMode {
                     armExt.resetEncoder();
                 }, armExt)));
 
+        new GamepadButton(driver, GamepadKeys.Button.RIGHT_BUMPER).whenPressed(
+                new InstantCommand(() -> driveMult = 0.5))
+                .whenReleased(new InstantCommand(() -> driveMult = 1));
+
+        new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER).whenPressed(
+                        new InstantCommand(() -> driveMult = 0.33))
+                .whenReleased(new InstantCommand(() -> driveMult = 1));
+
+        new GamepadButton(driver, GamepadKeys.Button.DPAD_UP).whenPressed(
+                new InstantCommand(() -> DriveCommand.target = startPose.getHeading())
+        );
+        new GamepadButton(driver, GamepadKeys.Button.DPAD_RIGHT).whenPressed(
+                new InstantCommand(() -> DriveCommand.target = startPose.getHeading() - Math.toRadians(90))
+        );
+        new GamepadButton(driver, GamepadKeys.Button.DPAD_DOWN).whenPressed(
+                new InstantCommand(() -> DriveCommand.target = startPose.getHeading() + Math.toRadians(180))
+        );
+        new GamepadButton(driver, GamepadKeys.Button.DPAD_LEFT).whenPressed(
+                new InstantCommand(() -> DriveCommand.target = startPose.getHeading() + Math.toRadians(90))
+        );
 
         schedule(new RunCommand(() -> {
             telemetry.addData("Current State:", currentState.name());
@@ -264,7 +286,7 @@ public class TeleOp extends CommandOpMode {
                 new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
                 new PIDMoveCommand(armExt, States.ArmExtension.home),
                 new PIDMoveCommand(armPivot, States.ArmPivot.home),
-                new InstantCommand(() -> claw.setClawState(States.Claw.home)),
+                new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
                 swapState(States.Global.home)
         );
     }

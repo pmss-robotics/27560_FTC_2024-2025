@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 @Autonomous(name="Bucket Auto", group="Auto")
 public class Bucket_Auto extends CommandOpMode {
     Pose start = new Pose(9.124016, 104.874016, Math.toRadians(-90));
-    Pose bucket = new Pose(24, 120, Math.toRadians(315));
+    Pose bucket = new Pose(18, 126, Math.toRadians(315));
     Pose sample1 = new Pose(24, 120, Math.toRadians(0));
     Pose sample2 = new Pose(24, 120, Math.toRadians(30));
     Pose sample3 = new Pose(24, 120, Math.toRadians(45));
