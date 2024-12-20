@@ -100,7 +100,8 @@ public class TeleOp extends CommandOpMode {
                 ),
                 new SequentialCommandGroup(
                         new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
-                        returnHome()
+                        returnHome(armExt, armPivot, claw),
+                        swapState(States.Global.home)
                 ),
                 () -> currentState != States.Global.intake_far
         ));
@@ -110,7 +111,10 @@ public class TeleOp extends CommandOpMode {
                         intake(armExt, armPivot, claw, States.ArmExtension.home),
                         swapState(States.Global.intake_near)
                 ),
-                returnHome(),
+                new SequentialCommandGroup(
+                        returnHome(armExt, armPivot, claw),
+                        swapState(States.Global.home)
+                ),
                 () -> currentState != States.Global.intake_near
         ));
         // bucket
@@ -119,7 +123,10 @@ public class TeleOp extends CommandOpMode {
                         lowBucket(armExt, armPivot, claw),
                         swapState(States.Global.bucket)
                 ),
-                returnHome(),
+                new SequentialCommandGroup(
+                        returnHome(armExt, armPivot, claw),
+                        swapState(States.Global.home)
+                ),
                 () -> currentState != States.Global.bucket
         ));
         // specimen
@@ -128,7 +135,10 @@ public class TeleOp extends CommandOpMode {
                         specimen(armExt, armPivot, claw),
                         swapState(States.Global.specimen)
                 ),
-                returnHome(),
+                new SequentialCommandGroup(
+                        returnHome(armExt, armPivot, claw),
+                        swapState(States.Global.home)
+                ),
                 () -> currentState != States.Global.specimen
         ));
 
@@ -281,13 +291,5 @@ public class TeleOp extends CommandOpMode {
                 return new InstantCommand();
         }
     }
-    public SequentialCommandGroup returnHome() {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
-                new PIDMoveCommand(armExt, States.ArmExtension.home),
-                new PIDMoveCommand(armPivot, States.ArmPivot.home),
-                new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
-                swapState(States.Global.home)
-        );
-    }
+
 }

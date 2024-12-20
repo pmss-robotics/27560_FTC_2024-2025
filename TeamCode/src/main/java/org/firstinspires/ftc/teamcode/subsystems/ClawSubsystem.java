@@ -31,8 +31,8 @@ public class ClawSubsystem extends SubsystemBase {
     public static double F_target = 0, H_target = 0, W_target = 0; // in degrees
 
     private States.Claw currentClawState;
-    public static double wpHome = 200, wpBucket = 280, wpSpecimen = 0, wpIntake = 260, wpStart =  175 ; // in degrees
-    public static double hpHome = 165, hpBucket = 165, hpSpecimen = 0, hpIntake = 165, hpStart = 165; // in degrees
+    public static double wpHome = 200, wpBucket = 280, wpSpecimen = 300, wpIntake = 260, wpStart =  175 ; // in degrees
+    public static double hpHome = 165, hpBucket = 165, hpSpecimen = 165, hpIntake = 165, hpStart = 165; // in degrees
 
     private States.Finger currentFingerState;
     public static double pClosed = 65, pOpen = 155; // in degrees
@@ -141,12 +141,15 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     public void wristSetPosition(double target) {
+        W_target = target;
         wrist.setPosition(scale(target));
     }
     public void handSetPosition(double target) {
+        H_target = target;
         hand.setPosition(scale(target));
     }
     public void fingerSetPosition(double target) {
+        F_target = target;
         finger.setPosition(scale(target));
     }
 

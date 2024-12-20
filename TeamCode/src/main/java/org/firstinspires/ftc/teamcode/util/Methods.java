@@ -45,6 +45,7 @@ public class Methods {
     public static long dropTimeout = 500;
     public static SequentialCommandGroup bucketDrop(ClawSubsystem claw) {
         return new SequentialCommandGroup(
+                new WaitCommand(dropTimeout),
                 new InstantCommand(() -> claw.setFingerState(States.Finger.opened)),
                 new WaitCommand(dropTimeout),
                 new InstantCommand(() -> claw.setClawState(States.Claw.home))
@@ -58,6 +59,15 @@ public class Methods {
                 new PIDMoveCommand(ext, position),
                 new InstantCommand(() -> claw.setClawState(States.Claw.home)),
                 new InstantCommand(() -> claw.setFingerState(States.Finger.opened))
+        );
+    }
+
+    public static SequentialCommandGroup returnHome(ArmExtensionSubsystem armExt, ArmPivotSubsystem armPivot, ClawSubsystem claw) {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
+                new PIDMoveCommand(armExt, States.ArmExtension.home),
+                new PIDMoveCommand(armPivot, States.ArmPivot.home),
+                new InstantCommand(() -> claw.setClawState(States.Claw.intake))
         );
     }
 
