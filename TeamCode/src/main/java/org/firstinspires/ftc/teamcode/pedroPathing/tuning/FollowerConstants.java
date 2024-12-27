@@ -110,6 +110,7 @@ public class FollowerConstants {
     // When the robot is at the end of its current Path or PathChain and the velocity goes below
     // this value, then end the Path. This is in inches/second.
     // This can be custom set for each Path.
+    // TODO: apparently setting this to 3 can fix overshoot issues if we come across them.
     public static double pathEndVelocityConstraint = 0.1;
 
     // When the robot is at the end of its current Path or PathChain and the translational error
