@@ -3,13 +3,11 @@ package org.firstinspires.ftc.teamcode.util;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.pathgen.Point;
 
 import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
-import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;

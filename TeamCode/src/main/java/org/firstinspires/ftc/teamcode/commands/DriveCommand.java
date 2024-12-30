@@ -1,15 +1,12 @@
 package org.firstinspires.ftc.teamcode.commands;
 
-import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.headingPIDFFeedForward;
-
 import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.pedropathing.follower.FollowerConstants;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.MathFunctions;
+import com.pedropathing.util.PIDFController;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.MathFunctions;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Vector;
-import org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants;
-import org.firstinspires.ftc.teamcode.pedroPathing.util.PIDFController;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 
 import java.util.function.DoubleSupplier;
@@ -43,7 +40,7 @@ public class DriveCommand extends CommandBase {
     @Override
     public void execute() {
         headingPIDF.setCoefficients(FollowerConstants.headingPIDFCoefficients); //FIXME: remove me when done tuning
-        Pose currentPose = drive.follower.poseUpdater.getPose();
+        Pose currentPose = drive.follower.getPose();
         if(rx.getAsDouble()!= 0) {
             target = drive.follower.getPose().getHeading();
             drive.follower.setTeleOpMovementVectors(ly.getAsDouble(), lx.getAsDouble(), rx.getAsDouble(), !isFieldCentric);
@@ -51,7 +48,7 @@ public class DriveCommand extends CommandBase {
             // possibly deadband?
             double headingError = MathFunctions.getTurnDirection(currentPose.getHeading(), target) * MathFunctions.getSmallestAngleDifference(currentPose.getHeading(), target);
             headingPIDF.updateError(headingError);
-            double heading = MathFunctions.clamp(headingPIDF.runPIDF() + headingPIDFFeedForward * MathFunctions.getTurnDirection(currentPose.getHeading(), target), -1, 1);
+            double heading = MathFunctions.clamp(headingPIDF.runPIDF() + FollowerConstants.headingPIDFFeedForward * MathFunctions.getTurnDirection(currentPose.getHeading(), target), -1, 1);
             drive.follower.setTeleOpMovementVectors(ly.getAsDouble(), lx.getAsDouble(), heading, !isFieldCentric);
         }
 

@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.commands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
-import com.arcrobotics.ftclib.command.Subsystem;
+import com.pedropathing.pathgen.Path;
+import com.pedropathing.pathgen.PathChain;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Path;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
-
-import java.util.Collections;
-import java.util.Set;
 
 public class PedroPathCommand extends CommandBase {
 

@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.util.Methods.*;
+import static org.firstinspires.ftc.teamcode.util.Methods.bucketDrop;
+import static org.firstinspires.ftc.teamcode.util.Methods.intake;
+import static org.firstinspires.ftc.teamcode.util.Methods.lowBucket;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -12,14 +14,16 @@ import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.PathChain;
+import com.pedropathing.pathgen.Point;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.commands.PedroPathCommand;
-import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
-import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.BezierLine;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.PathChain;
-import org.firstinspires.ftc.teamcode.pedroPathing.pathGeneration.Point;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
@@ -47,7 +51,7 @@ public class Bucket_Auto extends CommandOpMode {
     @Override
     public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        drive = new DriveSubsystem(new Follower(hardwareMap), start, telemetry);
+        drive = new DriveSubsystem(new Follower(hardwareMap, FConstants.class, LConstants.class), start, telemetry);
         armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
         armExt.setDefaultCommand(new RunCommand(armExt::holdPosition, armExt));
 
@@ -123,7 +127,7 @@ public class Bucket_Auto extends CommandOpMode {
         reset();
     }
 
-
+    //FIXME we don't need these race groups. you can just set a timeout constraint on the path.
     public static long bucketWait = 3500;
     public ParallelCommandGroup bucket() {
         return new ParallelCommandGroup(

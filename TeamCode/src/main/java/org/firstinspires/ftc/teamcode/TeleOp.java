@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.util.Methods.*;
+import static org.firstinspires.ftc.teamcode.util.Methods.intake;
+import static org.firstinspires.ftc.teamcode.util.Methods.lowBucket;
+import static org.firstinspires.ftc.teamcode.util.Methods.returnHome;
+import static org.firstinspires.ftc.teamcode.util.Methods.specimen;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -14,16 +17,16 @@ import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SelectCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
-import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.localization.Pose;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
-import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
 import org.firstinspires.ftc.teamcode.commands.SpecimenRoutine;
-import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
-import org.firstinspires.ftc.teamcode.pedroPathing.localization.Pose;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
@@ -61,7 +64,7 @@ public class TeleOp extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         tools = new GamepadEx(gamepad2);
         // The driveSubsystem wraps Roadrunner's MecanumDrive to combine with Commands.
-        drive = new DriveSubsystem(new Follower(hardwareMap), startPose, telemetry);
+        drive = new DriveSubsystem(new Follower(hardwareMap, FConstants.class, LConstants.class), startPose, telemetry);
         // The driveCommand uses methods defined in the DriveSubsystem to create behaviour.
         // we're passing in methods to get values instead of straight values because it avoids
         // disturbing the structure of the CommandOpMode. The aim is to define bindings in this
