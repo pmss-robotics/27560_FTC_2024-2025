@@ -21,6 +21,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.util.Constants;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
@@ -33,6 +34,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.util.States;
+
 
 
 //hello
@@ -64,7 +66,8 @@ public class TeleOp extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         tools = new GamepadEx(gamepad2);
         // The driveSubsystem wraps Roadrunner's MecanumDrive to combine with Commands.
-        drive = new DriveSubsystem(new Follower(hardwareMap, FConstants.class, LConstants.class), startPose, telemetry);
+        Constants.setConstants(FConstants.class, LConstants.class);
+        drive = new DriveSubsystem(new Follower(hardwareMap), startPose, telemetry);
         // The driveCommand uses methods defined in the DriveSubsystem to create behaviour.
         // we're passing in methods to get values instead of straight values because it avoids
         // disturbing the structure of the CommandOpMode. The aim is to define bindings in this

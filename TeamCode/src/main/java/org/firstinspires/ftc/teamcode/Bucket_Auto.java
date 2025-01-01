@@ -19,6 +19,7 @@ import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
+import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.commands.PedroPathCommand;
@@ -51,7 +52,8 @@ public class Bucket_Auto extends CommandOpMode {
     @Override
     public void initialize() {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        drive = new DriveSubsystem(new Follower(hardwareMap, FConstants.class, LConstants.class), start, telemetry);
+        Constants.setConstants(FConstants.class, LConstants.class);
+        drive = new DriveSubsystem(new Follower(hardwareMap), start, telemetry);
         armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
         armExt.setDefaultCommand(new RunCommand(armExt::holdPosition, armExt));
 
