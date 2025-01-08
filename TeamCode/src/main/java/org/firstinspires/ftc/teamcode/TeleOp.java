@@ -101,7 +101,7 @@ public class TeleOp extends CommandOpMode {
         // far intake
         new GamepadButton(tools, GamepadKeys.Button.B).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.intake),
+                        intake(armExt, armPivot, claw, States.ArmExtension.intake, States.Claw.intake),
                         swapState(States.Global.intake_far)
                 ),
                 new SequentialCommandGroup(
@@ -114,7 +114,7 @@ public class TeleOp extends CommandOpMode {
         // near intake
         new GamepadButton(tools, GamepadKeys.Button.A).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.home),
+                        intake(armExt, armPivot, claw, States.ArmExtension.home, States.Claw.intake),
                         swapState(States.Global.intake_near)
                 ),
                 new SequentialCommandGroup(
@@ -123,6 +123,19 @@ public class TeleOp extends CommandOpMode {
                 ),
                 () -> currentState != States.Global.intake_near
         ));
+        // specimen intake
+        new GamepadButton(tools, GamepadKeys.Button.RIGHT_STICK_BUTTON).whenPressed(new ConditionalCommand(
+           new SequentialCommandGroup(
+                   intake(armExt, armPivot, claw, States.ArmExtension.home, States.Claw.specimenIntake),
+                   swapState(States.Global.specimenIntake)
+                   ),
+           new SequentialCommandGroup(
+                   returnHome(armExt, armPivot, claw),
+                   swapState(States.Global.home)
+           ),
+           () -> currentState != States.Global.specimenIntake
+        ));
+
         // bucket
         new GamepadButton(tools, GamepadKeys.Button.X).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(

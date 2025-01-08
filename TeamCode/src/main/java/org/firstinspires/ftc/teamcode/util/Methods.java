@@ -50,9 +50,9 @@ public class Methods {
         );
     }
 
-    public static SequentialCommandGroup intake(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw, States.ArmExtension position) {
+    public static SequentialCommandGroup intake(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw, States.ArmExtension position, States.Claw clawState) {
         return new SequentialCommandGroup(
-                new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
+                new InstantCommand(() -> claw.setClawState(clawState)),
                 new PIDMoveCommand(pivot, States.ArmPivot.intake),
                 new PIDMoveCommand(ext, position),
                 new InstantCommand(() -> claw.setClawState(States.Claw.home)),

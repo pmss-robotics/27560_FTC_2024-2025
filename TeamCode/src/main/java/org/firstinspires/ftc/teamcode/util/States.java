@@ -9,6 +9,7 @@ public class States {
         intake_near,
         bucket,
         specimen,
+        specimenIntake,
     }
 
     // Arm Enums
@@ -36,6 +37,7 @@ public class States {
         home,
         intake,
         specimen,
+        specimenIntake,
         bucket
     }
 
