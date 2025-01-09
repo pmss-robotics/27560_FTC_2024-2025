@@ -18,6 +18,8 @@ import com.arcrobotics.ftclib.command.WaitCommand;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.pathgen.BezierLine;
+import com.pedropathing.pathgen.Path;
+import com.pedropathing.pathgen.PathBuilder;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
@@ -35,14 +37,17 @@ import org.firstinspires.ftc.teamcode.util.States;
 
 
 @Config
-@Autonomous(name="Bucket Auto", group="Auto")
-public class Bucket_Auto extends CommandOpMode {
+@Autonomous(name="Specimen Auto", group="Auto")
+public class Specimen_Auto extends CommandOpMode {
 
-    Pose start = new Pose(9.124016, 104.874016, Math.toRadians(-90));
-    Pose bucket = new Pose(18, 126, Math.toRadians(315));
-    Pose sample1 = new Pose(27, 132, Math.toRadians(-30));
-    Pose sample2 = new Pose(25, 132, Math.toRadians(0));
-    Pose sample3 = new Pose(27, 131, Math.toRadians(29));
+    Pose start = new Pose(9.124016, 56.874016, Math.toRadians(180));
+    // fix me
+    Pose specimenEnd = new Pose(36, 64, Math.toRadians(180));
+    Pose sample1 = new Pose(27, 12, Math.toRadians(-30));
+    Pose sample2 = new Pose(25, 12, Math.toRadians(0));
+    Pose sample3 = new Pose(27, 11, Math.toRadians(29));
+    double sampleDeposit1 = Math.toRadians(90);
+    double sampleDeposit2 = Math.toRadians(180);
 
     DriveSubsystem drive;
     ArmExtensionSubsystem armExt;
@@ -63,42 +68,22 @@ public class Bucket_Auto extends CommandOpMode {
         claw = new ClawSubsystem(hardwareMap, telemetry);
         claw.setDefaultCommand(new RunCommand(claw::holdPosition, claw));
 
+        PathChain preload = drive.follower.pathBuilder()
+                        .addBezierLine(new Point(start), new Point(specimenEnd))
+                        .setLinearHeadingInterpolation(start.getHeading(), specimenEnd.getHeading())
+                        .build();
+
+
         schedule(new RunCommand(() -> {
             telemetry.update();
         }));
 
+
         SequentialCommandGroup routine = new SequentialCommandGroup(
-                bucket(),
-                bucketDrop(claw), // preload
                 new ParallelCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.intake, States.Claw.intake),
-                        new PedroPathCommand(drive, toSample(sample1), true)
-                ),
-                new InstantCommand(() -> claw.handSetPosition(193)),
-                new WaitCommand(200),
-                new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
-                new WaitCommand(300),
-                bucket(),
-                bucketDrop(claw), // sample 1
-                new ParallelCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.intake, States.Claw.intake),
-                        new PedroPathCommand(drive, toSample(sample2), true)
-                ),
-                new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
-                new WaitCommand(300),
-                bucket(),
-                bucketDrop(claw), // sample 2
-                new ParallelCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.intake, States.Claw.intake),
-                        new PedroPathCommand(drive, toSample(sample3), true)
-                ),
-                new InstantCommand(() -> claw.handSetPosition(137)),
-                new WaitCommand(200),
-                new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
-                new WaitCommand(300),
-                bucket(),
-                bucketDrop(claw), //sample 3
-                returnHome(armExt, armPivot, claw)
+                        returnHome(armExt, armPivot, claw),
+                        new PedroPathCommand(drive, preload)
+                )
         );
         schedule(routine);
 
@@ -121,30 +106,5 @@ public class Bucket_Auto extends CommandOpMode {
         PoseTransfer.pose = drive.getPose();
     }
 
-    //FIXME we don't need these race groups. you can just set a timeout constraint on the path.
-    public ParallelCommandGroup bucket() {
-        return new ParallelCommandGroup(
-                new PedroPathCommand(drive, toBucket(start), true),
-                lowBucket(armExt, armPivot, claw)
-        );
-    }
 
-    public static long bucketWait = 3500;
-
-    public PathChain toBucket(Pose start){
-        return drive.follower.pathBuilder()
-                .addPath(new BezierLine(new Point(start), new Point(bucket)))
-                .setLinearHeadingInterpolation(start.getHeading(), bucket.getHeading())
-                .setPathEndTimeoutConstraint(bucketWait)
-                .build();
-    }
-
-    public static long sampleWait = 3500;
-    public PathChain toSample(Pose end) {
-        return drive.follower.pathBuilder()
-                .addPath(new BezierLine(new Point(bucket), new Point(end)))
-                .setLinearHeadingInterpolation(bucket.getHeading(), end.getHeading())
-                .setPathEndTimeoutConstraint(sampleWait)
-                .build();
-    }
 }

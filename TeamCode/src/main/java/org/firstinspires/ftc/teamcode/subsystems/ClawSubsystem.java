@@ -31,7 +31,7 @@ public class ClawSubsystem extends SubsystemBase {
     public static double F_target = 0, H_target = 0, W_target = 0; // in degrees
 
     private States.Claw currentClawState;
-    public static double wpHome = 200, wpBucket = 280, wpSpecimen = 300, wpSpecimenIntake = 210, wpIntake = 260, wpStart =  175 ; // in degrees
+    public static double wpHome = 200, wpBucket = 280, wpSpecimen = 200, wpSpecimenIntake = 220, wpIntake = 260, wpStart =  175 ; // in degrees
     public static double hpHome = 165, hpBucket = 165, hpSpecimen = 165, hpIntake = 165, hpStart = 165; // in degrees
 
     private States.Finger currentFingerState;

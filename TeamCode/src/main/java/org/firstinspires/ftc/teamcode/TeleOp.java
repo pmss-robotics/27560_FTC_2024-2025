@@ -33,6 +33,7 @@ import org.firstinspires.ftc.teamcode.subsystems.ArmPivotSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.util.PoseTransfer;
 import org.firstinspires.ftc.teamcode.util.States;
 
 
@@ -54,9 +55,10 @@ public class TeleOp extends CommandOpMode {
     public static double pivotThreshold = 0.5;
     public static double driveMult = 1;
 
-    Pose startPose = new Pose(72,72,0);
+    Pose startPose;
     @Override
     public void initialize() {
+        startPose = PoseTransfer.pose;
         // data sent to telemetry shows up on dashboard and driverGamepad station
         // data sent to the telemetry packet only shows up on the dashboard
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -290,6 +292,7 @@ public class TeleOp extends CommandOpMode {
             run();
         }
         reset();
+        PoseTransfer.pose = new Pose();
     }
 
     public InstantCommand swapState(States.Global state) {
