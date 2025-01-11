@@ -40,9 +40,13 @@ import org.firstinspires.ftc.teamcode.util.States;
 @Autonomous(name="Specimen Auto", group="Auto")
 public class Specimen_Auto extends CommandOpMode {
 
-    Pose start = new Pose(9.124016, 56.874016, Math.toRadians(180));
+    //Pose start = new Pose(9.124016, 56.874016, Math.toRadians(180));
+    Pose start = new Pose(9.124016, 104.874016, Math.toRadians(-90));
+
     // fix me
     Pose specimenEnd = new Pose(36, 64, Math.toRadians(180));
+    Pose bucket = new Pose(18, 126, Math.toRadians(315));
+
     Pose sample1 = new Pose(27, 12, Math.toRadians(-30));
     Pose sample2 = new Pose(25, 12, Math.toRadians(0));
     Pose sample3 = new Pose(27, 11, Math.toRadians(29));
@@ -69,8 +73,8 @@ public class Specimen_Auto extends CommandOpMode {
         claw.setDefaultCommand(new RunCommand(claw::holdPosition, claw));
 
         PathChain preload = drive.follower.pathBuilder()
-                        .addBezierLine(new Point(start), new Point(specimenEnd))
-                        .setLinearHeadingInterpolation(start.getHeading(), specimenEnd.getHeading())
+                        .addBezierLine(new Point(start), new Point(bucket))
+                        .setLinearHeadingInterpolation(start.getHeading(), bucket.getHeading())
                         .build();
 
 
@@ -82,7 +86,7 @@ public class Specimen_Auto extends CommandOpMode {
         SequentialCommandGroup routine = new SequentialCommandGroup(
                 new ParallelCommandGroup(
                         returnHome(armExt, armPivot, claw),
-                        new PedroPathCommand(drive, preload)
+                        new PedroPathCommand(drive, preload,true)
                 )
         );
         schedule(routine);
@@ -94,8 +98,8 @@ public class Specimen_Auto extends CommandOpMode {
         initialize();
         // retract to a position
         while (!isStarted()) {
-            armExt.holdPosition();
-            armPivot.holdPosition();
+            //armExt.holdPosition();
+           // armPivot.holdPosition();
         }
         waitForStart();
         // run the scheduler

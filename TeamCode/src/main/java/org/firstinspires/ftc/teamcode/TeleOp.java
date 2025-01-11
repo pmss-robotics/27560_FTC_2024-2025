@@ -22,6 +22,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.util.Constants;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
@@ -98,6 +99,9 @@ public class TeleOp extends CommandOpMode {
         }
 
          */
+
+        Servo lights = hardwareMap.get(Servo.class, "lights");
+        lights.setPosition(1.0);
 
 
         // far intake
