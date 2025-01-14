@@ -17,16 +17,16 @@ public class ArmExtensionSubsystem extends SubsystemBase {
     Telemetry telemetry;
     public DcMotorEx leftExtension, rightExtension;
 
-    public static double P = -0.04, I = 0, D = 0;
-    public static double kSpring = 0.01;
-    //max 3820
-    public static int pHome = 5, pIntake = 3600, pSpecimen = 2200, pBucket = 1400, pStart = 0;
+    public static double P = -0.07, I = 0, D = 0;
+    public static double kSpring = -0.008;
+    //max 980
+    public static int pHome = 5, pIntake = 800, pSpecimen = 300, pBucket = 360, pStart = 0;
     public static int pSpecimen_offset = 0;
 
     public static int target = 0;
-    public static double tolerance = 20;
+    public static double tolerance = 10;
 
-    public static double manualPower = 1;
+    public static double manualPower = 0.5;
 
     public PIDController pidController;
     private VoltageSensor voltageSensor;

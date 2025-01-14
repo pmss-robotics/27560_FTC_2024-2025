@@ -26,11 +26,11 @@ public class ArmPivotSubsystem extends SubsystemBase {
     public DcMotorEx leftPivot, rightPivot;
     IntSupplier extensionAmount;
 
-    public static double P = 0.014, I = 0.00001, D = 0.0035;
-    public static double kCos = 0.05, kExt = 0.000018, kHelp = 0;
+    public static double P = 0.014, I = 0.00000, D = 0.0035;
+    public static double kCos = 0.05, kExt = 0.0001, kHelp = 0;
     public static int ticksPerRev = 1772;
-    public static int pHome = 0, pBucket = 465, pSpecimen = 165, pIntake = 0, pStart = 200;
-    public static double tolerance = 10;
+    public static int pHome = 0, pBucket = 465, pSpecimen = 185, pSpecimenIntake = 60, pIntake = 0, pStart = 200;
+    public static double tolerance = 15;
 
 
     public static int target = 0;
@@ -107,6 +107,9 @@ public class ArmPivotSubsystem extends SubsystemBase {
                 break;
             case specimen:
                 moveTo(pSpecimen);
+                break;
+            case specimenIntake:
+                moveTo(pSpecimenIntake);
                 break;
             case start:
                 moveTo(pStart);

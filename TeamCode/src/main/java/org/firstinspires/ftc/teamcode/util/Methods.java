@@ -33,7 +33,7 @@ public class Methods {
     }
     public static SequentialCommandGroup specimen(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw) {
         return new SequentialCommandGroup(
-                new InstantCommand(() -> claw.setClawState(States.Claw.home)),
+                new InstantCommand(() -> claw.setClawState(States.Claw.specimen)),
                 new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
                 new PIDMoveCommand(pivot, States.ArmPivot.specimen),
                 new PIDMoveCommand(ext, States.ArmExtension.specimen_1)
@@ -50,17 +50,21 @@ public class Methods {
         );
     }
 
-    public static SequentialCommandGroup intake(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw, States.ArmExtension position, States.Claw clawState) {
-        States.Claw homeState;
-        if(clawState == States.Claw.specimenIntake) homeState = States.Claw.specimenIntake;
-        else {
-            homeState = States.Claw.home;
-        }
+    public static SequentialCommandGroup specimenIntake(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw) {
         return new SequentialCommandGroup(
-                new InstantCommand(() -> claw.setClawState(clawState)),
+                new InstantCommand(() -> claw.setClawState(States.Claw.specimenIntake)),
+                new InstantCommand(() -> claw.setFingerState(States.Finger.opened)),
+                new PIDMoveCommand(pivot, States.ArmPivot.specimenIntake),
+                new PIDMoveCommand(ext, States.ArmExtension.home)
+        );
+    }
+
+    public static SequentialCommandGroup intake(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw, States.ArmExtension position) {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
                 new PIDMoveCommand(pivot, States.ArmPivot.intake),
                 new PIDMoveCommand(ext, position),
-                new InstantCommand(() -> claw.setClawState(homeState)),
+                new InstantCommand(() -> claw.setClawState(States.Claw.home)),
                 new InstantCommand(() -> claw.setFingerState(States.Finger.opened))
         );
     }

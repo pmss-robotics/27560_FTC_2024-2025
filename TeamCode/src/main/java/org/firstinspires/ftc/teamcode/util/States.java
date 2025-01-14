@@ -16,6 +16,7 @@ public class States {
     public enum ArmPivot {
         start,
         specimen,
+        specimenIntake,
         bucket,
         intake,
         home,

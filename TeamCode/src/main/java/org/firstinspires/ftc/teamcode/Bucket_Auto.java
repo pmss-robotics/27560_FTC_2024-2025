@@ -71,7 +71,7 @@ public class Bucket_Auto extends CommandOpMode {
                 bucket(),
                 bucketDrop(claw), // preload
                 new ParallelCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.intake, States.Claw.intake),
+                        intake(armExt, armPivot, claw, States.ArmExtension.intake),
                         new ParallelRaceGroup(
                                 new PedroPathCommand(drive, toSample(sample1), true),
                                 new WaitCommand(sampleWait)
@@ -84,7 +84,7 @@ public class Bucket_Auto extends CommandOpMode {
                 bucket(),
                 bucketDrop(claw), // sample 1
                 new ParallelCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.intake, States.Claw.intake),
+                        intake(armExt, armPivot, claw, States.ArmExtension.intake),
                         new ParallelRaceGroup(
                                 new PedroPathCommand(drive, toSample(sample2), true),
                                 new WaitCommand(sampleWait)
@@ -95,7 +95,7 @@ public class Bucket_Auto extends CommandOpMode {
                 bucket(),
                 bucketDrop(claw), // sample 2
                 new ParallelCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.intake, States.Claw.intake),
+                        intake(armExt, armPivot, claw, States.ArmExtension.intake),
                         new ParallelRaceGroup(
                                 new PedroPathCommand(drive, toSample(sample3), true),
                                 new WaitCommand(sampleWait)

@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.util.Methods.intake;
-import static org.firstinspires.ftc.teamcode.util.Methods.lowBucket;
-import static org.firstinspires.ftc.teamcode.util.Methods.returnHome;
-import static org.firstinspires.ftc.teamcode.util.Methods.specimen;
+import static org.firstinspires.ftc.teamcode.util.Methods.*;
+
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -107,7 +105,7 @@ public class TeleOp extends CommandOpMode {
         // far intake
         new GamepadButton(tools, GamepadKeys.Button.B).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.intake, States.Claw.intake),
+                        intake(armExt, armPivot, claw, States.ArmExtension.intake),
                         swapState(States.Global.intake_far)
                 ),
                 new SequentialCommandGroup(
@@ -120,7 +118,7 @@ public class TeleOp extends CommandOpMode {
         // near intake
         new GamepadButton(tools, GamepadKeys.Button.A).whenPressed(new ConditionalCommand(
                 new SequentialCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.home, States.Claw.intake),
+                        intake(armExt, armPivot, claw, States.ArmExtension.home),
                         swapState(States.Global.intake_near)
                 ),
                 new SequentialCommandGroup(
@@ -132,7 +130,7 @@ public class TeleOp extends CommandOpMode {
         // specimen intake
         new GamepadButton(tools, GamepadKeys.Button.RIGHT_STICK_BUTTON).whenPressed(new ConditionalCommand(
            new SequentialCommandGroup(
-                   intake(armExt, armPivot, claw, States.ArmExtension.home, States.Claw.specimenIntake),
+                   specimenIntake(armExt, armPivot, claw),
                    swapState(States.Global.specimenIntake)
                    ),
            new SequentialCommandGroup(
@@ -304,15 +302,16 @@ public class TeleOp extends CommandOpMode {
     }
     public Command bumper() {
         switch (currentState) {
+            case specimenIntake:
             case intake_far:
+            case specimen:
             case intake_near:
                 return new SequentialCommandGroup(
                         new InstantCommand(claw::toggleFingerState)
                 );
             case bucket:
                 return new InstantCommand(() -> claw.setFingerState(States.Finger.opened));
-            case specimen:
-                return new SpecimenRoutine(claw, armExt);
+
             default:
                 return new InstantCommand();
         }

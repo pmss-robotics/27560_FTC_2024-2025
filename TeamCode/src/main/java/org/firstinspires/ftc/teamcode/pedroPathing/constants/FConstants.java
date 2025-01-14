@@ -24,7 +24,7 @@ public class FConstants {
         FollowerConstants.useBrakeModeInTeleOp = true;
         FollowerConstants.mass = 9.2; // in kg
 
-        FollowerConstants.xMovement = 72.0105;
+        FollowerConstants.xMovement = 71.2;
         FollowerConstants.yMovement = 73.7821;
 
         FollowerConstants.forwardZeroPowerAcceleration = -42.2;
