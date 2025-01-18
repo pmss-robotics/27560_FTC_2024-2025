@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode.vision;
 
 import android.graphics.Canvas;
 
+import com.acmerobotics.dashboard.config.Config;
+
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.CameraCalibration;
 import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.calib3d.Calib3d;
@@ -20,7 +22,7 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
-
+@Config
 public class AutoAlignProcessor implements VisionProcessor
 {
     /*

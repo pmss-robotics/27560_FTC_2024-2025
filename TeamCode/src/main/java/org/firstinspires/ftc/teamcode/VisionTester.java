@@ -7,10 +7,12 @@ import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.subsystems.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.subsystems.VisionSubsystem;
-
+@TeleOp
 public class VisionTester extends CommandOpMode {
     VisionSubsystem vision;
     GamepadEx tools;
@@ -23,6 +25,7 @@ public class VisionTester extends CommandOpMode {
 
         tools = new GamepadEx(gamepad2);
 
+
         try {
             vision = new VisionSubsystem(hardwareMap, telemetry);
         } catch (InterruptedException e) {
@@ -31,8 +34,13 @@ public class VisionTester extends CommandOpMode {
 
         new GamepadButton(tools, GamepadKeys.Button.A).whenPressed(
                 new InstantCommand(() -> {
+                    vision.enableDetection(true);
                     vision.getSampleAngle();
-                    telemetry.update();})
-        );
+                    telemetry.update();
+                }));
+        new GamepadButton(tools, GamepadKeys.Button.B).whenPressed(
+                new InstantCommand(() -> {
+                    vision.enableDetection(false);
+                }));
     }
 }

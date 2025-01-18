@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.teamcode.util.Methods.bucketDrop;
 import static org.firstinspires.ftc.teamcode.util.Methods.intake;
-import static org.firstinspires.ftc.teamcode.util.Methods.lowBucket;
 import static org.firstinspires.ftc.teamcode.util.Methods.returnHome;
+import static org.firstinspires.ftc.teamcode.util.Methods.specimen;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
@@ -11,15 +10,11 @@ import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.ParallelCommandGroup;
-import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.BezierLine;
-import com.pedropathing.pathgen.Path;
-import com.pedropathing.pathgen.PathBuilder;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
@@ -40,8 +35,9 @@ import org.firstinspires.ftc.teamcode.util.States;
 @Autonomous(name="Specimen Auto", group="Auto")
 public class Specimen_Auto extends CommandOpMode {
 
-    //Pose start = new Pose(9.124016, 56.874016, Math.toRadians(180));
-    Pose start = new Pose(9.124016, 104.874016, Math.toRadians(-90));
+    Pose start = new Pose(9.124016, 56.874016, Math.toRadians(90));
+    Pose preload = new Pose(39, 70, Math.toRadians(0));
+    Point preloadControl = new Point(7.4, 75.8);
 
     // fix me
     Pose specimenEnd = new Pose(36, 64, Math.toRadians(180));
@@ -64,17 +60,20 @@ public class Specimen_Auto extends CommandOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         Constants.setConstants(FConstants.class, LConstants.class);
         drive = new DriveSubsystem(new Follower(hardwareMap), start, telemetry);
+
         armExt = new ArmExtensionSubsystem(hardwareMap, telemetry);
         armExt.setDefaultCommand(new RunCommand(armExt::holdPosition, armExt));
 
         armPivot = new ArmPivotSubsystem(hardwareMap, telemetry, armExt.leftExtension::getCurrentPosition);
         armPivot.setDefaultCommand(new RunCommand(armPivot::holdPosition, armPivot));
+
         claw = new ClawSubsystem(hardwareMap, telemetry);
         claw.setDefaultCommand(new RunCommand(claw::holdPosition, claw));
 
-        PathChain preload = drive.follower.pathBuilder()
-                        .addBezierLine(new Point(start), new Point(bucket))
-                        .setLinearHeadingInterpolation(start.getHeading(), bucket.getHeading())
+
+        PathChain preloadPath = drive.follower.pathBuilder()
+                        .addBezierCurve(new Point(start), preloadControl, new Point(preload))
+                        .setLinearHeadingInterpolation(start.getHeading(), preload.getHeading())
                         .build();
 
 
@@ -84,10 +83,13 @@ public class Specimen_Auto extends CommandOpMode {
 
 
         SequentialCommandGroup routine = new SequentialCommandGroup(
-                new ParallelCommandGroup(
-                        returnHome(armExt, armPivot, claw),
-                        new PedroPathCommand(drive, preload,true)
-                )
+            specimen(armExt, armPivot, claw),
+            new PedroPathCommand(drive, preloadPath,true),
+            new InstantCommand(() -> claw.wristSetPosition(ClawSubsystem.pSpecimen2)),
+            new WaitCommand(400),
+            new PedroPathCommand(drive, goBack(preload), true),
+            new WaitCommand(400),
+            new InstantCommand(() -> claw.setFingerState(States.Finger.opened))
         );
         schedule(routine);
 
@@ -97,9 +99,11 @@ public class Specimen_Auto extends CommandOpMode {
     public void runOpMode() throws InterruptedException {
         initialize();
         // retract to a position
+        //claw.setClawState(States.Claw.start);
         while (!isStarted()) {
-            //armExt.holdPosition();
-           // armPivot.holdPosition();
+            armExt.holdPosition();
+            armPivot.holdPosition();
+            claw.holdPosition();
         }
         waitForStart();
         // run the scheduler
@@ -108,6 +112,13 @@ public class Specimen_Auto extends CommandOpMode {
         }
         reset();
         PoseTransfer.pose = drive.getPose();
+    }
+
+    PathChain goBack(Pose start) {
+        return drive.follower.pathBuilder()
+                .addBezierLine(new Point(start), new Point(start.getX() - 3.5, start.getY()))
+                .setLinearHeadingInterpolation(start.getHeading(), start.getHeading())
+                .build();
     }
 
 

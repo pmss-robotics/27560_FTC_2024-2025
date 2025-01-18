@@ -24,7 +24,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.commands.DriveCommand;
-import org.firstinspires.ftc.teamcode.commands.SpecimenRoutine;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 import org.firstinspires.ftc.teamcode.subsystems.ArmExtensionSubsystem;
@@ -58,8 +57,8 @@ public class TeleOp extends CommandOpMode {
     @Override
     public void initialize() {
         startPose = PoseTransfer.pose;
-        // data sent to telemetry shows up on dashboard and driverGamepad station
-        // data sent to the telemetry packet only shows up on the dashboard
+        // data sent to telemetry shows upButton on dashboard and driverGamepad station
+        // data sent to the telemetry packet only shows upButton on the dashboard
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
         telemetry.log().setDisplayOrder(Telemetry.Log.DisplayOrder.NEWEST_FIRST);
         telemetry.log().setCapacity(8);
@@ -98,8 +97,6 @@ public class TeleOp extends CommandOpMode {
 
          */
 
-        Servo lights = hardwareMap.get(Servo.class, "lights");
-        lights.setPosition(1.0);
 
 
         // far intake
@@ -139,6 +136,10 @@ public class TeleOp extends CommandOpMode {
            ),
            () -> currentState != States.Global.specimenIntake
         ));
+
+        new GamepadButton(tools, GamepadKeys.Button.LEFT_STICK_BUTTON).whenPressed(
+                new InstantCommand(() -> claw.wristSetPosition(ClawSubsystem.pSpecimen2))
+        );
 
         // bucket
         new GamepadButton(tools, GamepadKeys.Button.X).whenPressed(new ConditionalCommand(
@@ -243,7 +244,6 @@ public class TeleOp extends CommandOpMode {
                 }, armPivot)
         ));
 
-
         new GamepadButton(driver, GamepadKeys.Button.B).whileHeld(new ParallelCommandGroup(
                 new InstantCommand(() -> {
                     ArmExtensionSubsystem.target = 0;
@@ -251,27 +251,70 @@ public class TeleOp extends CommandOpMode {
                     armExt.resetEncoder();
                 }, armExt)));
 
-        new GamepadButton(driver, GamepadKeys.Button.RIGHT_BUMPER).whenPressed(
+        new GamepadButton(driver, GamepadKeys.Button.X).whenPressed(
+                new InstantCommand(() -> ClawSubsystem.offset += 5)
+        );
+        new GamepadButton(driver, GamepadKeys.Button.Y).whenPressed(
+                new InstantCommand(() -> ClawSubsystem.offset -= 5)
+        );
+        new GamepadButton(driver, GamepadKeys.Button.START).whenPressed(
+                new InstantCommand(() -> {
+                    startPose = new Pose();
+                    drive.follower = new Follower(hardwareMap);
+                })
+        );
+
+        GamepadButton rightBumper = new GamepadButton(driver, GamepadKeys.Button.RIGHT_BUMPER);
+        GamepadButton leftBumper = new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER);
+
+        rightBumper.whenPressed(
                 new InstantCommand(() -> driveMult = 0.5))
                 .whenReleased(new InstantCommand(() -> driveMult = 1));
 
-        new GamepadButton(driver, GamepadKeys.Button.LEFT_BUMPER).whenPressed(
-                        new InstantCommand(() -> driveMult = 0.33))
+        leftBumper.whenPressed(
+                new InstantCommand(() -> driveMult = 0.33))
                 .whenReleased(new InstantCommand(() -> driveMult = 1));
 
-        new GamepadButton(driver, GamepadKeys.Button.DPAD_UP).whenPressed(
+        GamepadButton upButton = new GamepadButton(driver, GamepadKeys.Button.DPAD_UP);
+        GamepadButton downButton = new GamepadButton(driver, GamepadKeys.Button.DPAD_DOWN);
+        GamepadButton rightButton = new GamepadButton(driver, GamepadKeys.Button.DPAD_RIGHT);
+        GamepadButton leftButton = new GamepadButton(driver, GamepadKeys.Button.DPAD_LEFT);
+
+        upButton.whenPressed(
                 new InstantCommand(() -> DriveCommand.target = startPose.getHeading())
         );
-        new GamepadButton(driver, GamepadKeys.Button.DPAD_RIGHT).whenPressed(
+        rightButton.whenPressed(
                 new InstantCommand(() -> DriveCommand.target = startPose.getHeading() - Math.toRadians(90))
         );
-        new GamepadButton(driver, GamepadKeys.Button.DPAD_DOWN).whenPressed(
+        downButton.whenPressed(
                 new InstantCommand(() -> DriveCommand.target = startPose.getHeading() + Math.toRadians(180))
         );
-        new GamepadButton(driver, GamepadKeys.Button.DPAD_LEFT).whenPressed(
+        leftButton.whenPressed(
                 new InstantCommand(() -> DriveCommand.target = startPose.getHeading() + Math.toRadians(90))
         );
 
+        upButton.and(rightBumper).whenActive(
+                new InstantCommand(() -> DriveCommand.target = startPose.getHeading() + Math.toRadians(45))
+        );
+        rightButton.and(rightBumper).whenActive(
+                new InstantCommand(() -> DriveCommand.target = startPose.getHeading() - Math.toRadians(45))
+        );
+        downButton.and(rightBumper).whenActive(
+                new InstantCommand(() -> DriveCommand.target = startPose.getHeading() + Math.toRadians(225))
+        );
+        leftButton.and(rightBumper).whenActive(
+                new InstantCommand(() -> DriveCommand.target = startPose.getHeading() + Math.toRadians(135))
+        );
+
+
+
+
+
+        Servo lights = hardwareMap.get(Servo.class, "lights");
+        schedule(new RunCommand(() -> {
+            if(claw.isOpen()) lights.setPosition(1);
+            else lights.setPosition(0.333);
+        }));
         schedule(new RunCommand(() -> {
             telemetry.addData("Current State:", currentState.name());
             telemetry.addData("heading (deg) target: ", DriveCommand.target);

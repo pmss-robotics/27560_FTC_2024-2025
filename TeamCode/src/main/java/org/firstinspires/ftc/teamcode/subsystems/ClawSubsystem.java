@@ -31,11 +31,13 @@ public class ClawSubsystem extends SubsystemBase {
     public static double F_target = 0, H_target = 0, W_target = 0; // in degrees
 
     private States.Claw currentClawState;
-    public static double wpHome = 200, wpBucket = 280, wpSpecimen = 280, wpSpecimenIntake = 250, wpIntake = 260, wpStart =  175 ; // in degrees
+    public static double wpHome = 50, wpBucket = 130, wpSpecimen = 110, wpSpecimenIntake = 100, wpIntake = 110, wpStart =  25, pSpecimen2 = 60;// in degrees
+    // 100
     public static double hpHome = 165, hpBucket = 165, hpSpecimen = 165, hpIntake = 165, hpStart = 165; // in degrees
 
     private States.Finger currentFingerState;
     public static double pClosed = 65, pOpen = 155; // in degrees
+    public static double offset = 0;
 
     public ClawSubsystem(HardwareMap hardwareMap, Telemetry telemetry) {
         // initialize hardware here alongside other parameters
@@ -60,12 +62,26 @@ public class ClawSubsystem extends SubsystemBase {
 
         currentClawState = States.Claw.home;
         currentFingerState = States.Finger.closed;
+        offset = 0;
+    }
+
+    public static double getF_target() {
+        return F_target;
+    }
+
+    public static double getW_target() {
+        return W_target + offset;
+    }
+
+    public static double getH_target() {
+        return H_target;
     }
 
     public void holdPosition() {
+
         finger.setPosition(scale(F_target));
         hand.setPosition(scale(H_target));
-        wrist.setPosition(scale(W_target));
+        wrist.setPosition(scale(getW_target()));
     }
 
     public States.Claw getCurrentClawState() {
@@ -87,7 +103,7 @@ public class ClawSubsystem extends SubsystemBase {
                 currentFingerState = States.Finger.opened;
                 break;
         }
-        fingerSetPosition(F_target);
+        fingerSetPosition(getF_target());
     }
 
     public void setFingerState(States.Finger state) {
@@ -100,7 +116,7 @@ public class ClawSubsystem extends SubsystemBase {
                 F_target = pClosed;
                 break;
         }
-        fingerSetPosition(F_target);
+        fingerSetPosition(getF_target());
     }
 
     public void setClawState(States.Claw state) {
@@ -128,8 +144,8 @@ public class ClawSubsystem extends SubsystemBase {
                 break;
             case start:
         }
-        handSetPosition(H_target);
-        wristSetPosition(W_target);
+        handSetPosition(getH_target());
+        wristSetPosition(getW_target());
     }
 
     @Override
@@ -137,6 +153,7 @@ public class ClawSubsystem extends SubsystemBase {
         telemetry.addData("finger position", finger.getPosition());
         telemetry.addData("hand position", hand.getPosition());
         telemetry.addData("wrist position", wrist.getPosition());
+        telemetry.addData("offset", offset);
     }
 
     private double scale(double angle){
@@ -146,15 +163,17 @@ public class ClawSubsystem extends SubsystemBase {
 
     public void wristSetPosition(double target) {
         W_target = target;
-        wrist.setPosition(scale(target));
+        wrist.setPosition(scale(getW_target()));
     }
     public void handSetPosition(double target) {
         H_target = target;
-        hand.setPosition(scale(target));
+        hand.setPosition(scale(getH_target()));
     }
     public void fingerSetPosition(double target) {
         F_target = target;
-        finger.setPosition(scale(target));
+        finger.setPosition(scale(getF_target()));
     }
+
+
 
 }

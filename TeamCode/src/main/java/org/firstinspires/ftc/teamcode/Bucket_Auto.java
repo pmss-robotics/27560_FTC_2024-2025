@@ -23,6 +23,7 @@ import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.commands.PIDMoveCommand;
 import org.firstinspires.ftc.teamcode.commands.PedroPathCommand;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
@@ -40,9 +41,9 @@ public class Bucket_Auto extends CommandOpMode {
 
     Pose start = new Pose(9.124016, 104.874016, Math.toRadians(-90));
     Pose bucket = new Pose(18, 126, Math.toRadians(315));
-    Pose sample1 = new Pose(27, 131, Math.toRadians(-30));
-    Pose sample2 = new Pose(25, 132, Math.toRadians(0));
-    Pose sample3 = new Pose(27, 131, Math.toRadians(29));
+    Pose sample1 = new Pose(29, 131, Math.toRadians(-30));
+    Pose sample2 = new Pose(29, 132, Math.toRadians(0));
+    Pose sample3 = new Pose(29, 132, Math.toRadians(29));
 
     DriveSubsystem drive;
     ArmExtensionSubsystem armExt;
@@ -71,7 +72,7 @@ public class Bucket_Auto extends CommandOpMode {
                 bucket(),
                 bucketDrop(claw), // preload
                 new ParallelCommandGroup(
-                        intake(armExt, armPivot, claw, States.ArmExtension.intake),
+                        intake(armExt, armPivot, claw, 1590),
                         new ParallelRaceGroup(
                                 new PedroPathCommand(drive, toSample(sample1), true),
                                 new WaitCommand(sampleWait)
@@ -80,7 +81,8 @@ public class Bucket_Auto extends CommandOpMode {
                 new InstantCommand(() -> claw.handSetPosition(193)),
                 new WaitCommand(200),
                 new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
-                new WaitCommand(300),
+                new WaitCommand(300)          /*,
+
                 bucket(),
                 bucketDrop(claw), // sample 1
                 new ParallelCommandGroup(
@@ -108,6 +110,8 @@ public class Bucket_Auto extends CommandOpMode {
                 bucket(),
                 bucketDrop(claw), //sample 3
                 returnHome(armExt, armPivot, claw)
+
+                 */
         );
         schedule(routine);
 
@@ -137,7 +141,13 @@ public class Bucket_Auto extends CommandOpMode {
                         new PedroPathCommand(drive, toBucket(start), true),
                         new WaitCommand(bucketWait)
                 ),
-                lowBucket(armExt, armPivot, claw)
+                 new SequentialCommandGroup(
+                        new InstantCommand(() -> claw.setClawState(States.Claw.home)),
+                        new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
+                        new PIDMoveCommand(armPivot, States.ArmPivot.bucket),
+                        new PIDMoveCommand(armExt, States.ArmExtension.bucket),
+                        new InstantCommand(() -> claw.setClawState(States.Claw.bucket))
+                )
         );
     }
 

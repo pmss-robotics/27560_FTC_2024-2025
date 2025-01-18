@@ -33,9 +33,9 @@ public class Methods {
     }
     public static SequentialCommandGroup specimen(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw) {
         return new SequentialCommandGroup(
-                new InstantCommand(() -> claw.setClawState(States.Claw.specimen)),
                 new InstantCommand(() -> claw.setFingerState(States.Finger.closed)),
                 new PIDMoveCommand(pivot, States.ArmPivot.specimen),
+                new InstantCommand(() -> claw.setClawState(States.Claw.specimen)),
                 new PIDMoveCommand(ext, States.ArmExtension.specimen_1)
         );
     }
@@ -60,6 +60,16 @@ public class Methods {
     }
 
     public static SequentialCommandGroup intake(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw, States.ArmExtension position) {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
+                new PIDMoveCommand(pivot, States.ArmPivot.intake),
+                new PIDMoveCommand(ext, position),
+                new InstantCommand(() -> claw.setClawState(States.Claw.home)),
+                new InstantCommand(() -> claw.setFingerState(States.Finger.opened))
+        );
+    }
+
+    public static SequentialCommandGroup intake(ArmExtensionSubsystem ext, ArmPivotSubsystem pivot, ClawSubsystem claw, int position) {
         return new SequentialCommandGroup(
                 new InstantCommand(() -> claw.setClawState(States.Claw.intake)),
                 new PIDMoveCommand(pivot, States.ArmPivot.intake),

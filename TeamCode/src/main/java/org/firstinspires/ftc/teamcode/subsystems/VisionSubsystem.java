@@ -27,6 +27,7 @@ import org.firstinspires.ftc.vision.VisionProcessor;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -112,7 +113,14 @@ public class VisionSubsystem extends SubsystemBase {
             // find the sample closest to the claw
             telemetry.addData("Sample: " + detections.indexOf(sample), " "+ sample.color);
             telemetry.addData("Sample: " + detections.indexOf(sample), " " + sample.angle);
-            telemetry.addData("Sample: " + detections.indexOf(sample), " " + sample.tvec.toString());
+
+            for (int i = 0; i < sample.tvec.rows(); i++) {
+                for (int j = 0; j < sample.tvec.cols(); j++) {
+                    telemetry.addData("Sample: " + detections.indexOf(sample), " term 1 " + Arrays.toString(sample.tvec.get(i, j)));
+
+                }
+                
+            }
         }
         if(Objects.isNull(closest)) return 666;
         return angle;
